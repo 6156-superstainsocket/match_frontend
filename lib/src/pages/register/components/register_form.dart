@@ -3,70 +3,121 @@ import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/utils/have_account.dart';
 
-class RegisterForm extends StatelessWidget {
-  const RegisterForm({Key? key}) : super(key: key);
+class RegisterForm extends StatefulWidget {
+  const RegisterForm({super.key});
+
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _email = TextEditingController();
+  final _pwd = TextEditingController();
+  final _pwdConfirm = TextEditingController();
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _pwd.dispose();
+    _pwdConfirm.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Form(child: Column(children: [
-      TextFormField(
-        keyboardType: TextInputType.emailAddress,
-        textInputAction: TextInputAction.next,
-        cursorColor: pinkColor,
-        onSaved: (email) {},
-        decoration: const InputDecoration(
-          hintText: "Email",
-          prefixIcon: Icon(Icons.email),
-        ),
-      ),
-      const SizedBox(height: defaultPadding),
-      TextFormField(
-        textInputAction: TextInputAction.next,
-        obscureText: true,
-        cursorColor: pinkHeavyColor,
-        onSaved: (password) {},
-        decoration: const InputDecoration(
-          hintText: "Password",
-          prefixIcon: Icon(Icons.password),
-        ),
-      ),
-      const SizedBox(height: defaultPadding),
-      TextFormField(
-        textInputAction: TextInputAction.done,
-        obscureText: true,
-        cursorColor: pinkHeavyColor,
-        onSaved: (confirmPassword) {},
-        decoration: const InputDecoration(
-          hintText: "Confirm Password",
-          prefixIcon: Icon(Icons.password),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: defaultPadding),
-        child: ElevatedButton(
-          onPressed: () {
-            // Validate will return true if the form is valid, or false if
-            // the form is invalid.
-            // if (_formKey.currentState!.validate()) {
-            //   // Process data.
-            // }
-          },
-          child: const Text('Sign Up'),
-        ),
-      ),
-      const SizedBox(height: defaultPadding),
-      AlreadyHaveAnAccountCheck(
-        login: false,
-        press: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return const Login();
-            },
-          ),
-        );
-      })
-    ],));
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: _email,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              cursorColor: pinkColor,
+              onSaved: (email) {},
+              decoration: const InputDecoration(
+                hintText: "Email",
+                prefixIcon: Icon(Icons.email),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please entern some text';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: defaultPadding),
+            TextFormField(
+              controller: _pwd,
+              textInputAction: TextInputAction.next,
+              obscureText: true,
+              cursorColor: pinkHeavyColor,
+              onSaved: (password) {},
+              decoration: const InputDecoration(
+                hintText: "Password",
+                prefixIcon: Icon(Icons.password),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: defaultPadding),
+            TextFormField(
+              controller: _pwdConfirm,
+              textInputAction: TextInputAction.done,
+              obscureText: true,
+              cursorColor: pinkHeavyColor,
+              onSaved: (confirmPassword) {},
+              decoration: const InputDecoration(
+                hintText: "Confirm Password",
+                prefixIcon: Icon(Icons.password),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                } else if (value != _pwd.text) {
+                  return 'Inconsistent password';
+                }
+                return null;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Validate will return true if the form is valid, or false if
+                  // the form is invalid.
+                  if (_formKey.currentState!.validate()) {
+                    // TODO: Process data.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Processing Data')),
+                    );
+                    // debugPrint('email: ${_email.text}');
+                    // debugPrint('pwd: ${_pwd.text}');
+                    // debugPrint('pwd: ${_pwdConfirm.text}');
+                  }
+                },
+                child: const Text('Sign Up'),
+              ),
+            ),
+            const SizedBox(height: defaultPadding),
+            AlreadyHaveAnAccountCheck(
+                login: false,
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const Login();
+                      },
+                    ),
+                  );
+                })
+          ],
+        ));
   }
 }
