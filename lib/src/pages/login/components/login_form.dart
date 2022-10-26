@@ -33,36 +33,40 @@ class _LoginFormState extends State<LoginForm> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               cursorColor: pinkHeavyColor,
-              onSaved: (email) {},
               decoration: const InputDecoration(
                 hintText: "Email",
                 prefixIcon: Icon(Icons.email),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter your email';
                 }
                 return null;
               },
             ),
+            Padding(padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            )),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,
               textInputAction: TextInputAction.done,
               obscureText: true,
               cursorColor: pinkHeavyColor,
-              onSaved: (password) {},
               decoration: const InputDecoration(
                 hintText: "Password",
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter your password';
                 }
                 return null;
               },
             ),
+            Padding(padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            )),
             const SizedBox(height: defaultPadding),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),

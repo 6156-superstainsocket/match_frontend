@@ -35,56 +35,62 @@ class _RegisterFormState extends State<RegisterForm> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               cursorColor: pinkColor,
-              onSaved: (email) {},
               decoration: const InputDecoration(
                 hintText: "Email",
                 prefixIcon: Icon(Icons.email),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please entern some text';
+                  return 'Please entern your email';
                 }
                 return null;
               },
             ),
+            Padding(padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            )),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,
               textInputAction: TextInputAction.next,
               obscureText: true,
               cursorColor: pinkHeavyColor,
-              onSaved: (password) {},
               decoration: const InputDecoration(
                 hintText: "Password",
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please enter your password';
                 }
                 return null;
               },
             ),
+            Padding(padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            )),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwdConfirm,
               textInputAction: TextInputAction.done,
               obscureText: true,
               cursorColor: pinkHeavyColor,
-              onSaved: (confirmPassword) {},
               decoration: const InputDecoration(
                 hintText: "Confirm Password",
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
+                  return 'Please re-enter your password';
                 } else if (value != _pwd.text) {
                   return 'Inconsistent password';
                 }
                 return null;
               },
             ),
+            Padding(padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            )),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton(
