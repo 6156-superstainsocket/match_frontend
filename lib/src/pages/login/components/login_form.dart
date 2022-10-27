@@ -44,9 +44,9 @@ class _LoginFormState extends State<LoginForm> {
                 return null;
               },
             ),
-            Padding(padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom
-            )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,
@@ -64,9 +64,9 @@ class _LoginFormState extends State<LoginForm> {
                 return null;
               },
             ),
-            Padding(padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom
-            )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
@@ -88,7 +88,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: defaultPadding),
             AlreadyHaveAnAccountCheck(press: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) {

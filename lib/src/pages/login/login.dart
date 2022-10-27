@@ -6,11 +6,13 @@ import 'package:demo/constants.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
-    return CenterBackground(
-      child: SingleChildScrollView(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: CenterBackground(
+          child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -35,7 +37,7 @@ class Login extends StatelessWidget {
             ),
           ],
         ),
-      )
+      )),
     );
   }
 }

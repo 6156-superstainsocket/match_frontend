@@ -46,9 +46,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 return null;
               },
             ),
-            Padding(padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom
-            )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,
@@ -66,9 +66,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 return null;
               },
             ),
-            Padding(padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom
-            )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwdConfirm,
@@ -88,9 +88,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 return null;
               },
             ),
-            Padding(padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom
-            )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton(
@@ -114,7 +114,7 @@ class _RegisterFormState extends State<RegisterForm> {
             AlreadyHaveAnAccountCheck(
                 login: false,
                 press: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) {
