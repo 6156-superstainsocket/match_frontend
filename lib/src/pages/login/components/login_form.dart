@@ -38,10 +38,9 @@ class _LoginFormState extends State<LoginForm> {
                 prefixIcon: Icon(Icons.email),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                return null;
+                return value!.trim().isNotEmpty
+                    ? null
+                    : "Please enter your email";
               },
             ),
             Padding(
@@ -58,10 +57,9 @@ class _LoginFormState extends State<LoginForm> {
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
+                return value!.trim().length > 5
+                    ? null
+                    : "The length of password should be greater than five";
               },
             ),
             Padding(

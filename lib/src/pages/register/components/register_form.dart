@@ -15,12 +15,16 @@ class _RegisterFormState extends State<RegisterForm> {
   final _email = TextEditingController();
   final _pwd = TextEditingController();
   final _pwdConfirm = TextEditingController();
+  final _firstname = TextEditingController();
+  final _lastname = TextEditingController();
 
   @override
   void dispose() {
     _email.dispose();
     _pwd.dispose();
     _pwdConfirm.dispose();
+    _firstname.dispose();
+    _lastname.dispose();
     super.dispose();
   }
 
@@ -30,6 +34,39 @@ class _RegisterFormState extends State<RegisterForm> {
         key: _formKey,
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                    child: TextFormField(
+                  controller: _firstname,
+                  textInputAction: TextInputAction.next,
+                  cursorColor: pinkColor,
+                  decoration: const InputDecoration(
+                    hintText: "Firstname",
+                  ),
+                  validator: (value) {
+                    return value!.trim().isNotEmpty ? null : "Empty field";
+                  },
+                )),
+                const SizedBox(
+                  width: 20.0,
+                ),
+                Flexible(
+                    child: TextFormField(
+                  controller: _lastname,
+                  textInputAction: TextInputAction.next,
+                  cursorColor: pinkColor,
+                  decoration: const InputDecoration(
+                    hintText: "Lastname",
+                  ),
+                  validator: (value) {
+                    return value!.trim().isNotEmpty ? null : "Empty field";
+                  },
+                ))
+              ],
+            ),
+            const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _email,
               keyboardType: TextInputType.emailAddress,
@@ -40,10 +77,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 prefixIcon: Icon(Icons.email),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please entern your email';
-                }
-                return null;
+                return value!.trim().isNotEmpty
+                    ? null
+                    : "Please enter your email";
               },
             ),
             Padding(
@@ -60,10 +96,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
+                return value!.trim().length > 5
+                    ? null
+                    : "The length of password should be greater than five";
               },
             ),
             Padding(
@@ -105,6 +140,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     // debugPrint('email: ${_email.text}');
                     // debugPrint('pwd: ${_pwd.text}');
                     // debugPrint('pwd: ${_pwdConfirm.text}');
+                    // debugPrint('firstname: ${_firstname.text}');
+                    // debugPrint('lastname: ${_lastname.text}');
                   }
                 },
                 child: const Text('Sign Up'),
