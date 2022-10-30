@@ -33,16 +33,10 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             const Divider(),
-            const Expanded(
-              child: Align(
-                alignment: FractionalOffset.bottomCenter,
-                child: ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text("Sign Out"),
-                ),
-              ),
+            const ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("Sign Out"),
             ),
-            const Padding(padding: EdgeInsets.symmetric(vertical: 12.0)),
           ],
         ),
       ),
