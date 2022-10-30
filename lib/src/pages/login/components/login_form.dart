@@ -1,3 +1,4 @@
+import 'package:demo/src/pages/group/group_main.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/utils/have_account.dart';
@@ -77,6 +78,15 @@ class _LoginFormState extends State<LoginForm> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Processing Data')),
                     );
+                    // TODO: navigate to home page
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return const GroupMain();
+                    //     },
+                    //   ),
+                    // );
                     // debugPrint('email: ${_email.text}');
                     // debugPrint('pwd: ${_pwd.text}');
                   }
