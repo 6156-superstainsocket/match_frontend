@@ -41,7 +41,6 @@ class _RegisterFormState extends State<RegisterForm> {
                     child: TextFormField(
                   controller: _firstname,
                   textInputAction: TextInputAction.next,
-                  cursorColor: pinkColor,
                   decoration: const InputDecoration(
                     hintText: "Firstname",
                   ),
@@ -56,7 +55,6 @@ class _RegisterFormState extends State<RegisterForm> {
                     child: TextFormField(
                   controller: _lastname,
                   textInputAction: TextInputAction.next,
-                  cursorColor: pinkColor,
                   decoration: const InputDecoration(
                     hintText: "Lastname",
                   ),
@@ -71,7 +69,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: _email,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              cursorColor: pinkColor,
               decoration: const InputDecoration(
                 hintText: "Email",
                 prefixIcon: Icon(Icons.email),
@@ -90,7 +87,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: _pwd,
               textInputAction: TextInputAction.next,
               obscureText: true,
-              cursorColor: pinkHeavyColor,
               decoration: const InputDecoration(
                 hintText: "Password",
                 prefixIcon: Icon(Icons.password),
@@ -109,7 +105,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: _pwdConfirm,
               textInputAction: TextInputAction.done,
               obscureText: true,
-              cursorColor: pinkHeavyColor,
               decoration: const InputDecoration(
                 hintText: "Confirm Password",
                 prefixIcon: Icon(Icons.password),

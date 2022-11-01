@@ -1,7 +1,8 @@
 import 'package:demo/constants.dart';
+import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:demo/src/pages/utils/my_drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:demo/src/pages/utils/logo_menu.dart';
 
 class GroupMain extends StatefulWidget {
   const GroupMain({super.key});
@@ -16,26 +17,7 @@ class _GroupMainState extends State<GroupMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: SvgPicture.asset(
-          "assets/svgs/logo.svg",
-          height: 32,
-          width: 32,
-          fit: BoxFit.scaleDown,
-        ),
-        centerTitle: true,
-        backgroundColor: pinkLightColor,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                icon: const Icon(Icons.menu, color: pinkHeavyColor));
-          },
-        ),
-      ),
+      appBar: const OverviewMenu(),
       drawer: const MyDrawer(),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -58,7 +40,7 @@ class _GroupMainState extends State<GroupMain> {
               _selectedIndex = index;
             });
           },
-          fixedColor: greenColor,
+          fixedColor: pinkHeavyColor,
           backgroundColor: Colors.white,
         ),
       ),
