@@ -1,6 +1,8 @@
 import 'package:demo/constants.dart';
-import 'package:flutter/material.dart';
+import 'package:demo/src/pages/group/group_main.dart';
 import 'package:demo/src/pages/login/login.dart';
+import 'package:flutter/material.dart';
+// import 'package:demo/src/pages/login/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Match',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,6 +28,10 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         scaffoldBackgroundColor: Colors.white,
         primaryColor: pinkHeavyColor,
+        appBarTheme: const AppBarTheme(
+            backgroundColor: pinkLightColor,
+            foregroundColor: Colors.black //here you can give the text color
+            ),
         inputDecorationTheme: const InputDecorationTheme(
           filled: true,
           fillColor: greyBackground,
@@ -40,17 +46,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: pinkHeavyColor,
-              shape: const StadiumBorder(),
-              maximumSize: const Size(double.infinity, 50),
-              minimumSize: const Size(double.infinity, 50),
-            ),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: pinkHeavyColor,
+            shape: const StadiumBorder(),
+            maximumSize: const Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 50),
           ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+                elevation: 0, foregroundColor: Colors.black)),
+        textSelectionTheme:
+            const TextSelectionThemeData(cursorColor: pinkColor),
+        dividerTheme: const DividerThemeData(color: pinkColor, thickness: 2),
       ),
-      
-      home: const Login(),
+      home: const GroupMain(),
     );
   }
 }
