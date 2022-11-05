@@ -5,12 +5,14 @@ part 'group.g.dart';
 
 @JsonSerializable()
 class Group {
-  String name;
+  @JsonKey(defaultValue: "")
+  String? name;
 
   @JsonKey(defaultValue: "")
   String? description;
 
-  int iconId;
+  @JsonKey(defaultValue: 0)
+  int? iconId;
 
   @JsonKey(defaultValue: false)
   bool? allowWithoutApproval;
@@ -18,10 +20,10 @@ class Group {
   List<Tag>? customTags;
 
   Group({
-    required this.name,
-    this.description,
-    required this.iconId,
-    this.allowWithoutApproval,
+    this.name = '',
+    this.description = '',
+    this.iconId = 0,
+    this.allowWithoutApproval = false,
     this.customTags,
   });
 

@@ -7,9 +7,9 @@ part of 'group.dart';
 // **************************************************************************
 
 Group _$GroupFromJson(Map<String, dynamic> json) => Group(
-      name: json['name'] as String,
+      name: json['name'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      iconId: json['iconId'] as int,
+      iconId: json['iconId'] as int? ?? 0,
       allowWithoutApproval: json['allowWithoutApproval'] as bool? ?? false,
       customTags: (json['customTags'] as List<dynamic>?)
           ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))

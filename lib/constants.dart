@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 const pinkColor = Color(0xFFF2C6C2);
 const pinkLightColor = Color(0xFFF2E8DF);
@@ -28,3 +29,33 @@ const TextStyle tagBlackTextStyle =
 const TextStyle textLargeSize = TextStyle(fontSize: 20);
 const TextStyle textMiddleSize = TextStyle(fontSize: 15);
 const TextStyle textSmallSize = TextStyle(fontSize: 10);
+
+const double imgWidth = 50.0;
+const double imgHeight = 50.0;
+
+const totalGroupSvg = 32;
+const String assetGroupPath = "assets/svgs/group/";
+
+final List<Widget> allGroupIcons = [
+  for (var i = 1; i <= totalGroupSvg; i += 1)
+    SvgPicture.asset(
+      "$assetGroupPath${i.toString()}.svg",
+      fit: BoxFit.scaleDown,
+    )
+];
+
+final List<IconData> defaultTagIcons = [
+  Icons.restaurant_outlined,
+  Icons.favorite_outline,
+  Icons.import_contacts_outlined,
+];
+
+final List<IconData> allTagIcons = [
+  Icons.restaurant_outlined,
+  Icons.favorite_outline,
+  Icons.import_contacts_outlined,
+  Icons.photo_camera_outlined
+];
+
+const double dialogWidth = 320;
+const double dialogHeight = 400;

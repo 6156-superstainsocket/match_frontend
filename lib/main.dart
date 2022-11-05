@@ -60,6 +60,10 @@ class MyApp extends StatelessWidget {
         textSelectionTheme:
             const TextSelectionThemeData(cursorColor: pinkColor),
         dividerTheme: const DividerThemeData(color: pinkColor, thickness: 2),
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: greyBackground,
+          actionTextColor: pinkHeavyColor,
+        ),
       ),
       home: const GroupMain(),
     );
