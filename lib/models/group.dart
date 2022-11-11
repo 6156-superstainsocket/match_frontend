@@ -24,7 +24,7 @@ class Group {
     this.description = '',
     this.iconId = 0,
     this.allowWithoutApproval = false,
-    this.customTags,
+    this.customTags = const [],
   });
 
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
