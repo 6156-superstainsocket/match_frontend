@@ -1,3 +1,4 @@
+import 'package:demo/models/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -40,6 +41,8 @@ final List<Widget> allGroupIcons = [
   for (var i = 1; i <= totalGroupSvg; i += 1)
     SvgPicture.asset(
       "$assetGroupPath${i.toString()}.svg",
+      width: imgWidth,
+      height: imgHeight,
       fit: BoxFit.scaleDown,
     )
 ];
@@ -59,3 +62,21 @@ final List<IconData> allTagIcons = [
 
 const double dialogWidth = 320;
 const double dialogHeight = 400;
+
+final List<Tag> defaultTags = [
+  Tag(
+    name: 'dinner',
+    description: 'I want to have dinner with her/him',
+    iconId: 0,
+  ),
+  Tag(
+    name: 'date',
+    description: 'I want to date her/him',
+    iconId: 1,
+  ),
+  Tag(
+    name: 'study',
+    description: 'I want to study with her/him',
+    iconId: 2,
+  ),
+];

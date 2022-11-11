@@ -12,8 +12,9 @@ Group _$GroupFromJson(Map<String, dynamic> json) => Group(
       iconId: json['iconId'] as int? ?? 0,
       allowWithoutApproval: json['allowWithoutApproval'] as bool? ?? false,
       customTags: (json['customTags'] as List<dynamic>?)
-          ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
-          .toList(),
+              ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{

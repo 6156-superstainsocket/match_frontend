@@ -221,14 +221,14 @@ class _SettingFormState extends State<SettingForm> {
                   flex: 10,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Default Tags',
                         style: textLargeSize,
                         textAlign: TextAlign.left,
                       ),
-                      SizedBox(height: 0.5 * defaultPadding),
-                      Expanded(child: DefaultTags()),
+                      const SizedBox(height: 0.5 * defaultPadding),
+                      Expanded(child: DefaultTags(tags: defaultTags)),
                     ],
                   ),
                 ),
