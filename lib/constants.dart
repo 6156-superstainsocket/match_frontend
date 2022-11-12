@@ -80,3 +80,5 @@ final List<Tag> defaultTags = [
     iconId: 2,
   ),
 ];
+
+const double visualDensityNum = 3.0;
