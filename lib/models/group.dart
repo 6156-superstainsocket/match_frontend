@@ -19,7 +19,10 @@ class Group {
 
   List<Tag>? customTags;
 
+  int id;
+
   Group({
+    required this.id,
     this.name = '',
     this.description = '',
     this.iconId = 0,

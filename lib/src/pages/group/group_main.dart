@@ -1,4 +1,5 @@
 import 'package:demo/constants.dart';
+import 'package:demo/src/pages/group/group_list.dart';
 import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:demo/src/pages/utils/my_drawer.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,28 @@ class GroupMain extends StatefulWidget {
 
 class _GroupMainState extends State<GroupMain> {
   int _selectedIndex = 0;
+  final List<String> _barTitles = ["Group", "Message", "Profile"];
+  static const List<Widget> _widgetOptions = <Widget>[
+    GroupList(),
+    Text(
+      'Index 1: Message',
+    ),
+    Text(
+      'Index 2: You',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const OverviewMenu(),
+      appBar: LogoMenu(
+        menuTitle: _barTitles[_selectedIndex],
+      ),
       drawer: const MyDrawer(),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
