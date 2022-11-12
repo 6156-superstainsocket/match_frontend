@@ -12,7 +12,7 @@ class MemberSetting extends StatefulWidget {
 }
 
 class _MemberSettingState extends State<MemberSetting> {
-  Group groupSetting = Group();
+  Group groupSetting = Group(id: 0);
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class MemberSettingForm extends StatefulWidget {
 }
 
 class _MemberSettingFormState extends State<MemberSettingForm> {
-  Group changedGroupSetting = Group();
+  Group changedGroupSetting = Group(id: 0);
 
   @override
   void initState() {
