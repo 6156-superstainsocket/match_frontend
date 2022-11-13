@@ -1,7 +1,7 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
+import 'package:demo/src/pages/group/group_create.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({super.key});
@@ -59,7 +59,18 @@ class _GroupListState extends State<GroupList> {
             ),
             IconButton(
               padding: const EdgeInsets.only(left: 8.0, right: 15.0),
-              onPressed: () => {},
+              onPressed: () => {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    return const FractionallySizedBox(
+                      heightFactor: popContainerHeightFactor,
+                      child: GroupCreate(),
+                    );
+                  },
+                )
+              },
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],
