@@ -1,4 +1,5 @@
 import 'package:demo/src/pages/group/admin_setting.dart';
+import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:demo/src/pages/group/member_setting.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';

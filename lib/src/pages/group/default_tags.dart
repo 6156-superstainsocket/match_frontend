@@ -13,6 +13,7 @@ class DefaultTags extends StatelessWidget {
       tags: tags,
       tagIcons: allTagIcons,
       showActions: false,
+      showEditButton: false,
     );
   }
 }

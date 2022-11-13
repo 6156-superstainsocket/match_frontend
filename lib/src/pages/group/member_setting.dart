@@ -2,7 +2,6 @@ import 'package:demo/src/pages/group/default_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class MemberSetting extends StatefulWidget {
   const MemberSetting({super.key});
@@ -49,6 +48,33 @@ class _MemberSettingState extends State<MemberSetting> {
           );
         },
       ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        elevation: 0,
+        child: ElevatedButton(
+          onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Quit the Group'),
+              content: const Text('Are you sure you wanna quit the group?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // TODO quit the group
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          ),
+          child: const Text('Quit the Group'),
+        ),
+      ),
     );
   }
 }
@@ -78,6 +104,8 @@ class _MemberSettingFormState extends State<MemberSettingForm> {
         ...defaultTags,
         ...widget.groupSetting.customTags!
       ];
+    } else {
+      changedGroupSetting.customTags = defaultTags;
     }
   }
 
@@ -152,6 +180,7 @@ class _MemberSettingFormState extends State<MemberSettingForm> {
               Expanded(
                 flex: 3,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     changedGroupSetting.allowWithoutApproval!
                         ? const Text(
@@ -195,32 +224,6 @@ class _MemberSettingFormState extends State<MemberSettingForm> {
                 ),
               ),
             ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: defaultPadding),
-          child: ElevatedButton(
-            onPressed: () => showDialog<String>(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text('Quit the Group'),
-                content: const Text('Are you sure you wanna quit the group?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // TODO quit the group
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            ),
-            child: const Text('Quit the Group'),
           ),
         ),
       ],

@@ -27,7 +27,8 @@ class _CustomTagsState extends State<CustomTags> {
   @override
   void initState() {
     super.initState();
-    if (widget.previousCustomTags != null) {
+    if (widget.previousCustomTags != null &&
+        widget.previousCustomTags!.isNotEmpty) {
       previewTags = widget.previousCustomTags!;
     }
   }
@@ -101,6 +102,7 @@ class _CustomTagsState extends State<CustomTags> {
                 tags: previewTags,
                 tagIcons: allTagIcons,
                 showActions: true,
+                showEditButton: true,
                 onEditPreviewtag: (tag) async {
                   Tag? newTag = await showUpdateTag(
                     oldTag: tag,
