@@ -62,8 +62,9 @@ class _OverviewMenuState extends State<OverviewMenu> {
                   builder: (context) {
                     return const FractionallySizedBox(
                         heightFactor: popContainerHeightFactor,
-                        child: EditTag(
-                          tags: [],
+                        // TODO: replace 0 with group id
+                        child: AdminSetting(
+                          id: 0,
                         ));
                   });
             },

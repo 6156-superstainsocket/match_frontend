@@ -6,14 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 
 class AdminSetting extends StatefulWidget {
-  const AdminSetting({super.key});
+  const AdminSetting({super.key, required this.id});
+
+  final int id;
 
   @override
   State<AdminSetting> createState() => _AdminSettingState();
 }
 
 class _AdminSettingState extends State<AdminSetting> {
-  Group groupSetting = Group();
+  Group groupSetting = Group(id: 0);
+
+  @override
+  void initState() {
+    // TODO: fill group information
+    super.initState();
+    groupSetting.id = widget.id;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +93,8 @@ class SettingForm extends StatefulWidget {
 
 class _SettingFormState extends State<SettingForm> {
   final GlobalKey<FormState> _adminSettingformKey = GlobalKey<FormState>();
-  Group changedGroupSetting = Group();
+  // TODO: fill group information
+  Group changedGroupSetting = Group(id: 0);
 
   @override
   void initState() {
