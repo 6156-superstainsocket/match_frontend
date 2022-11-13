@@ -8,12 +8,14 @@ class PreviewTags extends StatefulWidget {
   final List<Tag> tags;
   final List<IconData> tagIcons;
   final bool showActions;
+  final bool showEditButton;
   final PreviewTagCallBack? onEditPreviewtag;
   const PreviewTags({
     super.key,
     required this.tags,
     required this.tagIcons,
     required this.showActions,
+    required this.showEditButton,
     this.onEditPreviewtag,
   });
 
@@ -65,13 +67,16 @@ class _PreviewTagsState extends State<PreviewTags> {
                         flex: 2,
                         child: Row(
                           children: [
-                            IconButton(
-                              onPressed: (() {
-                                widget.onEditPreviewtag!(widget.tags[index]);
-                                removePreviewTag(index);
-                              }),
-                              icon: const Icon(Icons.edit_outlined),
-                            ),
+                            widget.showEditButton
+                                ? IconButton(
+                                    onPressed: (() {
+                                      widget.onEditPreviewtag!(
+                                          widget.tags[index]);
+                                      removePreviewTag(index);
+                                    }),
+                                    icon: const Icon(Icons.edit_outlined),
+                                  )
+                                : const Spacer(),
                             IconButton(
                               onPressed: (() {
                                 setState(() {
