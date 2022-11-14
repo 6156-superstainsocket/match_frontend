@@ -6,7 +6,15 @@ import 'package:demo/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OverviewMenu extends StatefulWidget implements PreferredSizeWidget {
-  const OverviewMenu({super.key});
+  const OverviewMenu(
+      {super.key,
+      required this.groupIconId,
+      required this.groupName,
+      required this.groupDescription});
+
+  final int groupIconId;
+  final String groupName;
+  final String groupDescription;
 
   @override
   State<OverviewMenu> createState() => _OverviewMenuState();
@@ -22,23 +30,22 @@ class _OverviewMenuState extends State<OverviewMenu> {
       title: Row(children: [
         Column(children: [
           // const Padding(padding: EdgeInsets.only(top: 0.5 * defaultPadding)),
-          SvgPicture.asset(
-            "assets/svgs/group/16.svg",
-            height: 50,
-            width: 50,
-            fit: BoxFit.scaleDown,
-          ),
+          allGroupIcons[widget.groupIconId],
           const Text('3 members',
               textAlign: TextAlign.left, style: textSmallSize)
         ]),
         Expanded(
-            child: Column(children: const [
-          Text('Group 1', textAlign: TextAlign.left, style: textLargeSize),
-          Text('this is a group for fun',
-              textAlign: TextAlign.left,
-              overflow: TextOverflow.ellipsis,
-              style: textSmallSize)
-        ])),
+          child: Column(
+            children: [
+              Text(widget.groupName,
+                  textAlign: TextAlign.left, style: textLargeSize),
+              Text(widget.groupDescription,
+                  textAlign: TextAlign.left,
+                  overflow: TextOverflow.ellipsis,
+                  style: textSmallSize),
+            ],
+          ),
+        ),
       ]),
       centerTitle: false,
       toolbarHeight: topMenuBarHeight,
@@ -46,8 +53,9 @@ class _OverviewMenuState extends State<OverviewMenu> {
       leading: Builder(
         builder: (context) {
           return IconButton(
-              // TODO: add back action
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
               icon: const Icon(Icons.arrow_back_ios_new));
         },
       ),
@@ -60,11 +68,11 @@ class _OverviewMenuState extends State<OverviewMenu> {
                   context: context,
                   isScrollControlled: true,
                   builder: (context) {
-                    return const FractionallySizedBox(
+                    return FractionallySizedBox(
                         heightFactor: popContainerHeightFactor,
                         // TODO: replace 0 with group id
                         child: AdminSetting(
-                          id: 0,
+                          id: widget.groupIconId,
                         ));
                   });
             },
