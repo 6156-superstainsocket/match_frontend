@@ -86,7 +86,7 @@ class _SettingFormState extends State<SettingForm> {
                       const SizedBox(height: 0.5 * defaultPadding),
                       Expanded(
                         child: TextFormField(
-                          initialValue: changedGroupSetting.description,
+                          initialValue: changedGroupSetting.name,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.done,
                           style: textMiddleSize,
@@ -164,6 +164,7 @@ class _SettingFormState extends State<SettingForm> {
                     ],
                   ),
                 ),
+                const Spacer(flex: 1),
               ],
             ),
           ),
@@ -267,7 +268,7 @@ class _SettingFormState extends State<SettingForm> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+            padding: const EdgeInsets.only(top: defaultPadding),
             child: ElevatedButton(
               onPressed: () {
                 if (_adminSettingformKey.currentState!.validate()) {

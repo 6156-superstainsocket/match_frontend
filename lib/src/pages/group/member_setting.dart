@@ -4,7 +4,8 @@ import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
 
 class MemberSetting extends StatefulWidget {
-  const MemberSetting({super.key});
+  final int groupId;
+  const MemberSetting({super.key, required this.groupId});
 
   @override
   State<MemberSetting> createState() => _MemberSettingState();
@@ -12,6 +13,12 @@ class MemberSetting extends StatefulWidget {
 
 class _MemberSettingState extends State<MemberSetting> {
   Group groupSetting = Group(id: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    groupSetting.id = widget.groupId;
+  }
 
   @override
   Widget build(BuildContext context) {

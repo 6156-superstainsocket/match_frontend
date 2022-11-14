@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 
 class AdminSetting extends StatefulWidget {
-  const AdminSetting({super.key, required this.id});
+  const AdminSetting({super.key, required this.groupId});
 
-  final int id;
+  final int groupId;
 
   @override
   State<AdminSetting> createState() => _AdminSettingState();
@@ -21,7 +21,7 @@ class _AdminSettingState extends State<AdminSetting> {
   void initState() {
     // TODO: fill group information
     super.initState();
-    groupSetting.id = widget.id;
+    groupSetting.id = widget.groupId;
   }
 
   @override
@@ -272,7 +272,7 @@ class _SettingFormState extends State<SettingForm> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+            padding: const EdgeInsets.only(top: defaultPadding),
             child: ElevatedButton(
               onPressed: () => showDialog<String>(
                 context: context,
