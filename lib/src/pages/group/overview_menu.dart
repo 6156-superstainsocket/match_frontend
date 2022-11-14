@@ -1,4 +1,5 @@
 import 'package:demo/src/pages/group/admin_setting.dart';
+import 'package:demo/src/pages/group/group_invite.dart';
 import 'package:demo/src/pages/group/member_setting.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
@@ -63,7 +64,19 @@ class _OverviewMenuState extends State<OverviewMenu> {
       ),
       actions: [
         IconButton(
-            onPressed: () {}, icon: const Icon(Icons.add_circle_outline)),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (context) {
+                  return FractionallySizedBox(
+                    heightFactor: popContainerHeightFactor,
+                    child: GroupInvite(groupId: widget.groupId),
+                  );
+                },
+              );
+            },
+            icon: const Icon(Icons.add_circle_outline)),
         IconButton(
             onPressed: () {
               showModalBottomSheet(
