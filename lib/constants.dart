@@ -82,3 +82,8 @@ final List<Tag> defaultTags = [
 ];
 
 const double visualDensityNum = 3.0;
+
+// number of groups returned per request
+const int groupsLoadNum = 10;
+// number of users returned per request
+const int groupUsersLoadNum = 20;

@@ -8,6 +8,7 @@ class User {
   String lastName;
   String email;
   int iconId;
+  int id;
 
   @JsonKey(defaultValue: "")
   String? description;
@@ -20,6 +21,7 @@ class User {
     required this.lastName,
     required this.email,
     required this.iconId,
+    required this.id,
     this.description,
     this.phone,
   });
