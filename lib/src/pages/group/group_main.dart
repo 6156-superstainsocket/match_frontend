@@ -1,6 +1,5 @@
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/group/group_list.dart';
-import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:demo/src/pages/utils/my_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/src/pages/utils/logo_menu.dart';
@@ -14,14 +13,11 @@ class GroupMain extends StatefulWidget {
 
 class _GroupMainState extends State<GroupMain> {
   int _selectedIndex = 0;
-  final List<String> _barTitles = ["Group", "Message", "Profile"];
+  final List<String> _barTitles = ["Group", "Message"];
   static const List<Widget> _widgetOptions = <Widget>[
     GroupList(),
     Text(
       'Index 1: Message',
-    ),
-    Text(
-      'Index 2: You',
     ),
   ];
 
@@ -48,7 +44,6 @@ class _GroupMainState extends State<GroupMain> {
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(
                 icon: Icon(Icons.message), label: "Message"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "You"),
           ],
           elevation: 0,
           currentIndex: _selectedIndex,

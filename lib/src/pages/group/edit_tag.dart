@@ -1,6 +1,5 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/tag.dart';
-import 'package:demo/src/pages/group/preview_tags.dart';
 import 'package:flutter/material.dart';
 
 class EditTag extends StatefulWidget {
@@ -12,13 +11,11 @@ class EditTag extends StatefulWidget {
 }
 
 class _EditTagState extends State<EditTag> {
-  final GlobalKey<FormState> _editTagformKey = GlobalKey<FormState>();
-
   List<Tag> previewTags = [];
   List<Tag> allCustomTags = [];
   List<Tag> allTags = [];
-  List<Tag> dropDownTags = [];
-  Map<int, Tag> previewTagMap = {};
+
+  Map<Tag, bool> checkboxValues = {};
 
   @override
   void initState() {
@@ -27,28 +24,20 @@ class _EditTagState extends State<EditTag> {
       previewTags = widget.tags;
     }
 
+    Map<int, Tag> previewTagsMap = {
+      for (var item in previewTags) item.id!: item
+    };
+
     // TODO, get allCustomTags from API
     allTags = [...defaultTags, ...allCustomTags];
-    previewTagMap = {for (var item in previewTags) item.id!: item};
 
-    for (var i = 0; i < allTags.length; i += 1) {
-      if (previewTagMap.containsKey(allTags[i].id)) {
-        continue;
+    for (var i = 0; i < allTags.length; i++) {
+      if (previewTagsMap.containsKey(allTags[i].id!)) {
+        checkboxValues[allTags[i]] = true;
+      } else {
+        checkboxValues[allTags[i]] = false;
       }
-      dropDownTags.add(allTags[i]);
     }
-  }
-
-  void addPreviewTag(Tag tag) {
-    setState(() {
-      previewTags.add(tag);
-    });
-  }
-
-  void removewPreviewTag(int index) {
-    setState(() {
-      previewTags.removeAt(index);
-    });
   }
 
   @override
@@ -85,47 +74,65 @@ class _EditTagState extends State<EditTag> {
               constraints: BoxConstraints(
                 minHeight: viewportConstraints.maxHeight,
               ),
-              child: Form(
-                key: _editTagformKey,
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      const Spacer(flex: 1),
-                      Expanded(
-                        flex: 10,
-                        child: IntrinsicHeight(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PreviewTags(
-                                tags: previewTags,
-                                tagIcons: allTagIcons,
-                                showActions: true,
-                                showEditButton: false,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(flex: 1),
+                  Expanded(
+                    flex: 10,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: defaultPadding),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: allTags.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Tag key = checkboxValues.keys.elementAt(index);
+                            return CheckboxListTile(
+                              title: Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Icon(
+                                        allTagIcons[key.iconId!],
+                                        size: tagHeight,
+                                        color: key.isMatch!
+                                            ? pinkHeavyColor
+                                            : greyHeavyColor,
+                                      ),
+                                      Text(key.name!,
+                                          style: key.isMatch!
+                                              ? tagRedTextStyle
+                                              : tagBlackTextStyle),
+                                    ],
+                                  ),
+                                  const Spacer(flex: 1),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Text(
+                                      key.description!,
+                                      style: textMiddleSize,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              // dropDownTags.isEmpty
-                              //     ? Container()
-                              //     : DropdownButtonFormField(
-                              //         items: dropDownTags
-                              //             .map<DropdownMenuItem<Tag>>(
-                              //                 (Tag value) {
-                              //           return DropdownMenuItem<Tag>(
-                              //             value: value,
-                              //             child: Text(value),
-                              //           );
-                              //         }).toList(),
-                              //         onChanged: (Object? value) {
-                              //           setState(() {});
-                              //         },
-                              //       ),
-                            ],
-                          ),
+                              value: checkboxValues[key],
+                              onChanged: ((value) {
+                                setState(() {
+                                  checkboxValues[key] = value!;
+                                });
+                              }),
+                            );
+                          },
                         ),
-                      ),
-                      const Spacer(flex: 1),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  const Spacer(flex: 1),
+                ],
               ),
             ),
           );
