@@ -1,5 +1,6 @@
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/group/group_list.dart';
+import 'package:demo/src/pages/message/message_bar.dart';
 import 'package:demo/src/pages/utils/my_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/src/pages/utils/logo_menu.dart';
@@ -16,9 +17,7 @@ class _GroupMainState extends State<GroupMain> {
   final List<String> _barTitles = ["Group", "Message"];
   static const List<Widget> _widgetOptions = <Widget>[
     GroupList(),
-    Text(
-      'Index 1: Message',
-    ),
+    MessageBar(),
   ];
 
   @override
