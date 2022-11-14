@@ -1,16 +1,20 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/tag.dart';
+import 'package:demo/models/user.dart';
 import 'package:flutter/material.dart';
 
 class EditTag extends StatefulWidget {
+  final int userId;
   final List<Tag> tags;
-  const EditTag({super.key, required this.tags});
+  const EditTag({super.key, required this.userId, required this.tags});
 
   @override
   State<EditTag> createState() => _EditTagState();
 }
 
 class _EditTagState extends State<EditTag> {
+  User user = User(id: 0);
+  bool showContactInfo = false;
   List<Tag> previewTags = [];
   List<Tag> allCustomTags = [];
   List<Tag> allTags = [];
@@ -20,8 +24,17 @@ class _EditTagState extends State<EditTag> {
   @override
   void initState() {
     super.initState();
+    user.id = widget.userId;
+
     if (widget.tags.isNotEmpty) {
       previewTags = widget.tags;
+    }
+
+    for (var i = 0; i < previewTags.length; i++) {
+      if (previewTags[i].isMatch!) {
+        showContactInfo = true;
+        break;
+      }
     }
 
     Map<int, Tag> previewTagsMap = {
@@ -45,7 +58,7 @@ class _EditTagState extends State<EditTag> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Edit Tags'),
+        title: const Text('Profile'),
         centerTitle: true,
         elevation: 0,
         leading: Builder(
@@ -61,7 +74,6 @@ class _EditTagState extends State<EditTag> {
         actions: [
           TextButton(
               onPressed: () {
-                debugPrint('${previewTags.length}');
                 Navigator.pop(context);
               },
               child: const Text('Save'))
@@ -84,6 +96,159 @@ class _EditTagState extends State<EditTag> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: defaultPadding),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                "$assetUserPath${(user.iconId! + 1).toString()}.png",
+                                width: profileImgWidth,
+                                height: profileImgHeight,
+                                fit: BoxFit.scaleDown,
+                              ),
+                            )
+                          ],
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 0.5 * defaultPadding),
+                          child: Divider(),
+                        ),
+                        IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Name',
+                                    style: textMiddleSize,
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  const SizedBox(height: 0.5 * defaultPadding),
+                                  Expanded(
+                                    child: Text(
+                                        "${user.firstName!} ${user.lastName!}",
+                                        style: textLargeSize),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 0.5 * defaultPadding),
+                          child: Divider(),
+                        ),
+                        IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Description',
+                                    style: textMiddleSize,
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  const SizedBox(height: 0.5 * defaultPadding),
+                                  Expanded(
+                                    child: Text(user.description!,
+                                        style: textLargeSize),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 0.5 * defaultPadding),
+                          child: Divider(),
+                        ),
+                        showContactInfo
+                            ? Column(
+                                children: [
+                                  IntrinsicHeight(
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Email',
+                                              style: textMiddleSize,
+                                              textAlign: TextAlign.left,
+                                            ),
+                                            const SizedBox(
+                                                height: 0.5 * defaultPadding),
+                                            Expanded(
+                                              child: Text(user.email!,
+                                                  style: textLargeSize),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 0.5 * defaultPadding),
+                                    child: Divider(),
+                                  ),
+                                  IntrinsicHeight(
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Phone',
+                                              style: textMiddleSize,
+                                              textAlign: TextAlign.left,
+                                            ),
+                                            const SizedBox(
+                                                height: 0.5 * defaultPadding),
+                                            Expanded(
+                                              child: Text(user.phone!,
+                                                  style: textLargeSize),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 0.5 * defaultPadding),
+                                    child: Divider(),
+                                  ),
+                                ],
+                              )
+                            : Container(),
+                        IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Tags',
+                                    style: textMiddleSize,
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 0.5 * defaultPadding),
+                        ),
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),

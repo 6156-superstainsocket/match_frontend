@@ -1,5 +1,7 @@
 import 'package:demo/constants.dart';
+import 'package:demo/models/tag.dart';
 import 'package:demo/models/user.dart';
+import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +32,8 @@ class _GroupUsersState extends State<GroupUsers> {
         firstName: "user",
         lastName: "1",
         email: "user1@xxx.com",
-        iconId: 1),
+        iconId: 1,
+        tags: defaultTags),
     User(
         id: 2,
         firstName: "user",
@@ -81,6 +84,8 @@ class _GroupUsersState extends State<GroupUsers> {
         groupIconId: widget.groupIconId,
         groupName: widget.groupName,
         groupDescription: widget.groupDescription,
+        groupId: widget.groupId,
+        isAdmin: true,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -146,14 +151,79 @@ class _GroupUsersState extends State<GroupUsers> {
                           visualDensity: const VisualDensity(
                             vertical: visualDensityNum,
                           ),
-                          leading: CircleAvatar(
-                            child: allGroupIcons[_users[index].iconId],
+                          leading: ClipOval(
+                            child: allUserIcons[_users[index].iconId!],
                           ),
-                          title: Text(
-                            "${_users[index].firstName} ${_users[index].lastName}",
+                          title: Row(
+                            children: [
+                              Text(
+                                "${_users[index].firstName} ${_users[index].lastName}",
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 0.5 * defaultPadding),
+                              ),
+                              (_users[index].tags != null &&
+                                      _users[index].tags!.isNotEmpty)
+                                  ? Expanded(
+                                      flex: 4,
+                                      child: SizedBox(
+                                        height: imgHeight,
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: _users[index].tags!.length,
+                                          itemBuilder: (BuildContext context,
+                                              int tagIndex) {
+                                            Tag userTag =
+                                                _users[index].tags![tagIndex];
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          0.5 * defaultPadding),
+                                              child: Column(
+                                                children: [
+                                                  Icon(
+                                                    allTagIcons[
+                                                        userTag.iconId!],
+                                                    size: tagMiniHeight,
+                                                    color: userTag.isMatch!
+                                                        ? pinkHeavyColor
+                                                        : greyHeavyColor,
+                                                  ),
+                                                  Text(
+                                                    userTag.name!,
+                                                    style: userTag.isMatch!
+                                                        ? tagRedTextStyle
+                                                        : tagBlackTextStyle,
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
                           ),
-                          onTap: () =>
-                              {debugPrint("User ID ${_users[index].id}")},
+                          onTap: () => {
+                            debugPrint("User ID ${_users[index].id}"),
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) {
+                                return FractionallySizedBox(
+                                  heightFactor: popContainerHeightFactor,
+                                  child: EditTag(
+                                    userId: _users[index].id,
+                                    tags: _users[index].tags!,
+                                  ),
+                                );
+                              },
+                            )
+                          },
                         )
                       : Container();
                 },

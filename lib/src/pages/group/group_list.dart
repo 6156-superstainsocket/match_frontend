@@ -1,5 +1,6 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
+import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:demo/src/pages/group/group_create.dart';
 import 'package:demo/src/pages/group/group_users.dart';
 import 'package:flutter/material.dart';
@@ -122,7 +123,7 @@ class _GroupListState extends State<GroupList> {
                         visualDensity: const VisualDensity(
                           vertical: visualDensityNum,
                         ),
-                        leading: CircleAvatar(
+                        leading: ClipOval(
                           child: allGroupIcons[_groupsName[index].iconId!],
                         ),
                         title: Text(
@@ -153,7 +154,6 @@ class _GroupListState extends State<GroupList> {
                         .contains(searchString)
                     ? const Divider(
                         height: 1,
-                        color: greyBackground,
                       )
                     : Container();
               }),

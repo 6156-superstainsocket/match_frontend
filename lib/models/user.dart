@@ -1,14 +1,23 @@
+import 'package:demo/models/tag.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
 
 @JsonSerializable()
 class User {
-  String firstName;
-  String lastName;
-  String email;
-  int iconId;
   int id;
+
+  @JsonKey(defaultValue: "")
+  String? firstName;
+
+  @JsonKey(defaultValue: "")
+  String? lastName;
+
+  @JsonKey(defaultValue: "")
+  String? email;
+
+  @JsonKey(defaultValue: 0)
+  int? iconId;
 
   @JsonKey(defaultValue: "")
   String? description;
@@ -16,14 +25,17 @@ class User {
   @JsonKey(defaultValue: "")
   String? phone;
 
+  List<Tag>? tags;
+
   User({
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.iconId,
     required this.id,
-    this.description,
-    this.phone,
+    this.firstName = '',
+    this.lastName = '',
+    this.email = '',
+    this.iconId = 0,
+    this.description = '',
+    this.phone = '',
+    this.tags = const [],
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
