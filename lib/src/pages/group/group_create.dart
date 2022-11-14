@@ -62,11 +62,6 @@ class _SettingFormState extends State<SettingForm> {
   Group changedGroupSetting = Group(id: -1);
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Form(
       key: _adminSettingformKey,
@@ -169,7 +164,6 @@ class _SettingFormState extends State<SettingForm> {
                     ],
                   ),
                 ),
-                const Spacer(flex: 1),
               ],
             ),
           ),
