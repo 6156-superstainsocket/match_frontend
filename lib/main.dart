@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
             foregroundColor: Colors.black //here you can give the text color
             ),
         inputDecorationTheme: const InputDecorationTheme(
+          floatingLabelStyle: TextStyle(color: pinkColor),
           filled: true,
           fillColor: greyBackground,
           iconColor: pinkColor,

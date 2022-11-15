@@ -97,7 +97,8 @@ class _GroupUsersState extends State<GroupUsers> {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 15.0, right: 7.0),
+                  padding: const EdgeInsets.only(
+                      left: defaultPadding, right: 0.5 * defaultPadding),
                   child: TextField(
                     onChanged: (value) {
                       setState(() {
@@ -125,7 +126,7 @@ class _GroupUsersState extends State<GroupUsers> {
                       // TODO: retrieve data, replace 15 with total groups user num
                       _retrieveGroupUserData();
                       return Container(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(defaultPadding),
                         alignment: Alignment.center,
                         child: const SizedBox(
                           width: 24.0,
@@ -136,7 +137,7 @@ class _GroupUsersState extends State<GroupUsers> {
                     } else {
                       return Container(
                         alignment: Alignment.center,
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(defaultPadding),
                         child: const Text(
                           "Hit Bottom",
                           style: TextStyle(color: greyColor),

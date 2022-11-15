@@ -1,5 +1,4 @@
 import 'package:demo/constants.dart';
-import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:flutter/material.dart';
 
 class GroupInvite extends StatefulWidget {

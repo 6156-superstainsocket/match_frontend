@@ -1,6 +1,5 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
-import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:demo/src/pages/group/group_create.dart';
 import 'package:demo/src/pages/group/group_users.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +51,10 @@ class _GroupListState extends State<GroupList> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(left: 15.0, right: 7.0),
+                padding: const EdgeInsets.only(
+                  left: defaultPadding,
+                  right: 0.5 * defaultPadding,
+                ),
                 child: TextField(
                   onChanged: (value) {
                     setState(() {
@@ -67,7 +69,10 @@ class _GroupListState extends State<GroupList> {
               ),
             ),
             IconButton(
-              padding: const EdgeInsets.only(left: 8.0, right: 15.0),
+              padding: const EdgeInsets.only(
+                left: 0.5 * defaultPadding,
+                right: defaultPadding,
+              ),
               onPressed: () => {
                 showModalBottomSheet(
                   context: context,
@@ -96,7 +101,7 @@ class _GroupListState extends State<GroupList> {
                     // TODO: retrieve data, replace 15 with total groups num
                     _retrieveData();
                     return Container(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(defaultPadding),
                       alignment: Alignment.center,
                       child: const SizedBox(
                         width: 24.0,
@@ -107,7 +112,7 @@ class _GroupListState extends State<GroupList> {
                   } else {
                     return Container(
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(defaultPadding),
                       child: const Text(
                         "Hit Bottom",
                         style: TextStyle(color: greyColor),
