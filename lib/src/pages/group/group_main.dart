@@ -26,7 +26,9 @@ class _GroupMainState extends State<GroupMain> {
       appBar: LogoMenu(
         menuTitle: _barTitles[_selectedIndex],
       ),
-      drawer: const MyDrawer(),
+      drawer: const MyDrawer(
+        userId: 0,
+      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,

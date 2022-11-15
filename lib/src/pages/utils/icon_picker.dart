@@ -7,6 +7,7 @@ Future<int?> showIconPicker({
   required bool isIcon,
   List<IconData>? icons,
   List<Widget>? svgs,
+  int? crossCount = 4,
 }) async {
   int? selectedIconId = defalutIconId;
 
@@ -18,8 +19,8 @@ Future<int?> showIconPicker({
               height: dialogHeight,
               alignment: Alignment.center,
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossCount!,
                 ),
                 itemCount: isIcon ? icons!.length : svgs!.length,
                 itemBuilder: (_, index) => Container(
