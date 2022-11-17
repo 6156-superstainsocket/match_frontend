@@ -6,7 +6,13 @@ import 'package:flutter/material.dart';
 class EditTag extends StatefulWidget {
   final int userId;
   final List<Tag> tags;
-  const EditTag({super.key, required this.userId, required this.tags});
+  final bool? showTags;
+  const EditTag({
+    super.key,
+    required this.userId,
+    required this.tags,
+    this.showTags = true,
+  });
 
   @override
   State<EditTag> createState() => _EditTagState();
@@ -30,10 +36,14 @@ class _EditTagState extends State<EditTag> {
       previewTags = widget.tags;
     }
 
-    for (var i = 0; i < previewTags.length; i++) {
-      if (previewTags[i].isMatch!) {
-        showContactInfo = true;
-        break;
+    if (widget.showTags! == false) {
+      showContactInfo = true;
+    } else {
+      for (var i = 0; i < previewTags.length; i++) {
+        if (previewTags[i].isMatch!) {
+          showContactInfo = true;
+          break;
+        }
       }
     }
 
@@ -71,13 +81,15 @@ class _EditTagState extends State<EditTag> {
           },
         ),
         toolbarHeight: topMenuBarHeight,
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Save'))
-        ],
+        actions: widget.showTags!
+            ? [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Save'))
+              ]
+            : null,
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -229,70 +241,76 @@ class _EditTagState extends State<EditTag> {
                                 ],
                               )
                             : Container(),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    'Tags',
-                                    style: textMiddleSize,
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                        widget.showTags!
+                            ? IntrinsicHeight(
+                                child: Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: const [
+                                        Text(
+                                          'Tags',
+                                          style: textMiddleSize,
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
                         const Padding(
                           padding: EdgeInsets.symmetric(
                               vertical: 0.5 * defaultPadding),
                         ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: allTags.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            Tag key = checkboxValues.keys.elementAt(index);
-                            return CheckboxListTile(
-                              title: Row(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Icon(
-                                        allTagIcons[key.iconId!],
-                                        size: tagHeight,
-                                        color: key.isMatch!
-                                            ? pinkHeavyColor
-                                            : greyHeavyColor,
-                                      ),
-                                      Text(key.name!,
-                                          style: key.isMatch!
-                                              ? tagRedTextStyle
-                                              : tagBlackTextStyle),
-                                    ],
-                                  ),
-                                  const Spacer(flex: 1),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Text(
-                                      key.description!,
-                                      style: textMiddleSize,
-                                      overflow: TextOverflow.ellipsis,
+                        widget.showTags!
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: allTags.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Tag key =
+                                      checkboxValues.keys.elementAt(index);
+                                  return CheckboxListTile(
+                                    title: Row(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Icon(
+                                              allTagIcons[key.iconId!],
+                                              size: tagHeight,
+                                              color: key.isMatch!
+                                                  ? pinkHeavyColor
+                                                  : greyHeavyColor,
+                                            ),
+                                            Text(key.name!,
+                                                style: key.isMatch!
+                                                    ? tagRedTextStyle
+                                                    : tagBlackTextStyle),
+                                          ],
+                                        ),
+                                        const Spacer(flex: 1),
+                                        Expanded(
+                                          flex: 4,
+                                          child: Text(
+                                            key.description!,
+                                            style: textMiddleSize,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              value: checkboxValues[key],
-                              onChanged: ((value) {
-                                setState(() {
-                                  checkboxValues[key] = value!;
-                                });
-                              }),
-                            );
-                          },
-                        ),
+                                    value: checkboxValues[key],
+                                    onChanged: ((value) {
+                                      setState(() {
+                                        checkboxValues[key] = value!;
+                                      });
+                                    }),
+                                  );
+                                },
+                              )
+                            : Container(),
                       ],
                     ),
                   ),

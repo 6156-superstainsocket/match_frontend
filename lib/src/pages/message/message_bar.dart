@@ -1,4 +1,5 @@
 import 'package:demo/constants.dart';
+import 'package:demo/src/pages/message/invitation.dart';
 import 'package:demo/src/pages/message/message_matched.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,7 @@ class _MessageBarState extends State<MessageBar> {
         body: TabBarView(
           children: [
             MessageMatched(),
-            Icon(Icons.directions_transit),
+            Invitation(),
             Icon(Icons.directions_bike),
           ],
         ),

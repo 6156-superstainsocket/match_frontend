@@ -1,60 +1,38 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/message.dart';
-import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:flutter/material.dart';
 
-class MessageMatched extends StatefulWidget {
-  const MessageMatched({super.key});
+class Invitation extends StatefulWidget {
+  const Invitation({super.key});
 
   @override
-  State<MessageMatched> createState() => _MessageMatchedState();
+  State<Invitation> createState() => _InvitationState();
 }
 
-class _MessageMatchedState extends State<MessageMatched> {
-  String fakeResponse =
-      '{"count":1,"data":[{"userId":1,"tagId":2,"groupId":8,"hasRead":false,"type":1,"userName":"User1","userIconId":10,"groupName":"Group1","groupIconId":10,"tagIconId":3,"tagName":"like"}]}';
-  static final Message loadingTag = Message(id: -1, type: 1);
-  var _messagesMatch = <Message>[loadingTag];
+class _InvitationState extends State<Invitation> {
+  static final Message loadingTag = Message(id: -1, type: 2);
+  var _messagesName = <Message>[loadingTag];
   final _fakeMessages = <Message>[
     Message(
       id: 1,
+      type: 2,
       userId: 1,
-      userName: "user 1",
-      userIconId: 1,
-      tagId: 1,
-      tagName: "tag 1",
-      tagIconId: 1,
-      groupId: 1,
-      groupName: "group 1",
-      groupIconId: 1,
-      type: 1,
+      userIconId: 0,
+      userName: "User1",
+      groupId: 0,
+      groupIconId: 5,
+      groupName: "group 333333333333333333333333 56wq57wq7w",
     ),
     Message(
       id: 2,
-      userId: 2,
-      userName: "user 2",
-      userIconId: 2,
-      tagId: 2,
-      tagName: "tag 2",
-      tagIconId: 2,
-      groupId: 2,
-      groupName: "group 2",
-      groupIconId: 2,
       type: 2,
-    ),
-    Message(
-      id: 3,
-      userId: 3,
-      userName: "user 3",
-      userIconId: 3,
-      tagId: 3,
-      tagName: "tag 3",
-      tagIconId: 3,
-      groupId: 3,
-      groupName: "group 333333333333333333333333",
+      userId: 2,
+      userIconId: 9,
+      userName: "User2",
+      groupId: 9,
       groupIconId: 3,
-      type: 3,
-    ),
+      groupName: "Group2",
+    )
   ];
 
   @override
@@ -62,7 +40,7 @@ class _MessageMatchedState extends State<MessageMatched> {
     super.initState();
     // TODO: initial data
     setState(() {
-      _messagesMatch.insertAll(_messagesMatch.length - 1, _fakeMessages);
+      _messagesName.insertAll(_messagesName.length - 1, _fakeMessages);
     });
   }
 
@@ -81,13 +59,12 @@ class _MessageMatchedState extends State<MessageMatched> {
         const SizedBox(height: 10),
         Expanded(
           child: ListView.separated(
-            itemCount: _messagesMatch.length,
-            itemBuilder: ((context, index) {
-              // reach bottom
-              if (_messagesMatch[index].id == loadingTag.id) {
-                if (_messagesMatch.length - 1 < 6) {
+            itemCount: _messagesName.length,
+            itemBuilder: (BuildContext context, int index) {
+              if (_messagesName[index].id == loadingTag.id) {
+                if (_messagesName.length - 1 < 15) {
                   // TODO: retrieve data, replace 15 with total groups num
-                  _retrieveMatchData();
+                  _retrieveData();
                   return Container(
                     padding: const EdgeInsets.all(defaultPadding),
                     alignment: Alignment.center,
@@ -121,11 +98,11 @@ class _MessageMatchedState extends State<MessageMatched> {
                           children: [
                             ClipOval(
                               child: allUserIcons[
-                                  _messagesMatch[index].userIconId!],
+                                  _messagesName[index].userIconId!],
                             ),
                             Expanded(
                               child: Text(
-                                _messagesMatch[index].userName!,
+                                _messagesName[index].userName!,
                                 style: textMiddleSize,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -136,19 +113,11 @@ class _MessageMatchedState extends State<MessageMatched> {
                       ),
                       Expanded(
                         child: Column(
-                          children: [
+                          children: const [
+                            Text('invite you'),
                             Icon(
-                              allTagIcons[_messagesMatch[index].tagIconId!],
-                              color: pinkHeavyColor,
-                              size: tagHeight,
-                            ),
-                            Expanded(
-                              child: Text(
-                                _messagesMatch[index].tagName!,
-                                style: tagMiniRedTextStyle,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              Icons.arrow_right_alt,
+                              size: imgWidth,
                             ),
                           ],
                         ),
@@ -159,11 +128,11 @@ class _MessageMatchedState extends State<MessageMatched> {
                           children: [
                             ClipOval(
                               child: allGroupIcons[
-                                  _messagesMatch[index].groupIconId!],
+                                  _messagesName[index].groupIconId!],
                             ),
                             Expanded(
                               child: Text(
-                                _messagesMatch[index].groupName!,
+                                _messagesName[index].groupName!,
                                 style: textMiddleSize,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -176,37 +145,23 @@ class _MessageMatchedState extends State<MessageMatched> {
                   ),
                 ),
                 onTap: () {
-                  debugPrint("User ID ${_messagesMatch[index].userId}");
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) {
-                      return FractionallySizedBox(
-                        heightFactor: popContainerHeightFactor,
-                        child: EditTag(
-                          userId: _messagesMatch[index].userId!,
-                          tags: const [],
-                          showTags: false,
-                        ),
-                      );
-                    },
-                  );
+                  debugPrint("Message ID ${_messagesName[index].id}");
                 },
               );
-            }),
-            separatorBuilder: (context, index) {
+            },
+            separatorBuilder: (BuildContext context, int index) {
               return const Divider();
             },
           ),
-        ),
+        )
       ],
     );
   }
 
-  void _retrieveMatchData() {
+  void _retrieveData() {
     Future.delayed(const Duration(seconds: 2)).then((value) {
       setState(() {
-        _messagesMatch.insertAll(_messagesMatch.length - 1, _fakeMessages);
+        _messagesName.insertAll(_messagesName.length - 1, _fakeMessages);
       });
     });
   }
