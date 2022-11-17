@@ -1,4 +1,5 @@
 import 'package:demo/constants.dart';
+import 'package:demo/src/pages/message/message_matched.dart';
 import 'package:flutter/material.dart';
 
 class MessageBar extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MessageBarState extends State<MessageBar> {
       child: Scaffold(
         appBar: TabBar(
           tabs: [
-            Tab(text: "Match"),
+            Tab(text: "Matched"),
             Tab(text: "Invitation"),
             Tab(text: "Management"),
           ],
@@ -24,7 +25,7 @@ class _MessageBarState extends State<MessageBar> {
         ),
         body: TabBarView(
           children: [
-            Icon(Icons.directions_car),
+            MessageMatched(),
             Icon(Icons.directions_transit),
             Icon(Icons.directions_bike),
           ],
