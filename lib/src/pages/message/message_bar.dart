@@ -1,5 +1,6 @@
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/message/invitation.dart';
+import 'package:demo/src/pages/message/management.dart';
 import 'package:demo/src/pages/message/message_matched.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,7 @@ class _MessageBarState extends State<MessageBar> {
           children: [
             MessageMatched(),
             Invitation(),
-            Icon(Icons.directions_bike),
+            Management(),
           ],
         ),
       ),

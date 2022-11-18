@@ -51,7 +51,7 @@ class _MessageMatchedState extends State<MessageMatched> {
       tagName: "tag 3",
       tagIconId: 3,
       groupId: 3,
-      groupName: "group 333333333333333333333333",
+      groupName: "group 3",
       groupIconId: 3,
       type: 3,
     ),
@@ -76,9 +76,7 @@ class _MessageMatchedState extends State<MessageMatched> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         Expanded(
           child: ListView.separated(
             itemCount: _messagesMatch.length,
@@ -89,11 +87,8 @@ class _MessageMatchedState extends State<MessageMatched> {
                   // TODO: retrieve data, replace 15 with total groups num
                   _retrieveMatchData();
                   return Container(
-                    padding: const EdgeInsets.all(defaultPadding),
                     alignment: Alignment.center,
                     child: const SizedBox(
-                      width: 24.0,
-                      height: 24.0,
                       child: CircularProgressIndicator(strokeWidth: 2.0),
                     ),
                   );
@@ -109,6 +104,9 @@ class _MessageMatchedState extends State<MessageMatched> {
                 }
               }
               return ListTile(
+                tileColor: _messagesMatch[index].hasRead!
+                    ? Colors.white
+                    : pinkLightColor,
                 visualDensity: const VisualDensity(
                   vertical: visualDensityNum,
                 ),
@@ -135,21 +133,30 @@ class _MessageMatchedState extends State<MessageMatched> {
                         ),
                       ),
                       Expanded(
-                        child: Column(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(
-                              allTagIcons[_messagesMatch[index].tagIconId!],
-                              color: pinkHeavyColor,
-                              size: tagHeight,
-                            ),
-                            Expanded(
-                              child: Text(
-                                _messagesMatch[index].tagName!,
-                                style: tagMiniRedTextStyle,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                            IntrinsicHeight(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    allTagIcons[
+                                        _messagesMatch[index].tagIconId!],
+                                    color: pinkHeavyColor,
+                                    size: tagHeight,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      _messagesMatch[index].tagName!,
+                                      style: tagMiniRedTextStyle,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            const Text('in'),
                           ],
                         ),
                       ),
@@ -177,6 +184,9 @@ class _MessageMatchedState extends State<MessageMatched> {
                 ),
                 onTap: () {
                   debugPrint("User ID ${_messagesMatch[index].userId}");
+                  setState(() {
+                    _messagesMatch[index].hasRead = true;
+                  });
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -195,7 +205,7 @@ class _MessageMatchedState extends State<MessageMatched> {
               );
             }),
             separatorBuilder: (context, index) {
-              return const Divider();
+              return const Divider(height: 1);
             },
           ),
         ),

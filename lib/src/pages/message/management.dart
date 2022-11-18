@@ -3,18 +3,14 @@ import 'package:demo/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class Invitation extends StatefulWidget {
-  const Invitation({super.key});
+class Management extends StatefulWidget {
+  const Management({super.key});
 
   @override
-  State<Invitation> createState() => _InvitationState();
+  State<Management> createState() => _ManagementState();
 }
 
-String getText(bool hasRead, bool hasAccept) {
-  if (!hasRead) {
-    return "invite you";
-  }
-
+String getText(bool hasAccept) {
   if (!hasAccept) {
     return "denied by you";
   }
@@ -22,31 +18,37 @@ String getText(bool hasRead, bool hasAccept) {
   return "accepted by you";
 }
 
-class _InvitationState extends State<Invitation> {
+class _ManagementState extends State<Management> {
   static final Message loadingTag = Message(id: -1, type: 2);
   var _messagesName = <Message>[loadingTag];
   final _fakeMessages = <Message>[
     Message(
       id: 1,
-      type: 2,
+      type: 3,
       userId: 1,
       userIconId: 0,
       userName: "User1",
       groupId: 0,
       groupIconId: 5,
       groupName: "Group3",
+      inviteByUserId: 3,
+      inviteByUserName: "User2",
+      inviteByUserIconId: 10,
       hasAccept: false,
       hasRead: false,
     ),
     Message(
       id: 2,
-      type: 2,
+      type: 3,
       userId: 2,
       userIconId: 9,
       userName: "User2",
       groupId: 9,
       groupIconId: 3,
       groupName: "Group2",
+      inviteByUserId: 4,
+      inviteByUserName: "User3",
+      inviteByUserIconId: 9,
       hasAccept: false,
       hasRead: false,
     )
@@ -160,13 +162,39 @@ class _InvitationState extends State<Invitation> {
                           ),
                         ),
                         Expanded(
+                          flex: 2,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                getText(_messagesName[index].hasRead!,
-                                    _messagesName[index].hasAccept!),
-                              ),
+                              !_messagesName[index].hasRead!
+                                  ? Row(children: [
+                                      const Text(
+                                        "invited by",
+                                      ),
+                                      IntrinsicHeight(
+                                        child: Column(
+                                          children: [
+                                            ClipOval(
+                                              child: allUserIcons[
+                                                  _messagesName[index]
+                                                      .inviteByUserIconId!],
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                _messagesName[index]
+                                                    .inviteByUserName!,
+                                                style: textMiddleSize,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ])
+                                  : Text(
+                                      getText(_messagesName[index].hasAccept!),
+                                    ),
                             ],
                           ),
                         ),

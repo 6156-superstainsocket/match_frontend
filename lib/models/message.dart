@@ -32,6 +32,9 @@ class Message {
   @JsonKey(defaultValue: false)
   bool? hasRead;
 
+  @JsonKey(defaultValue: false)
+  bool? hasAccept;
+
   @JsonKey(defaultValue: 0)
   int? inviteByUserId;
   @JsonKey(defaultValue: "")
@@ -52,6 +55,7 @@ class Message {
     this.groupName = "",
     this.groupIconId = 0,
     this.hasRead = false,
+    this.hasAccept = false,
     this.inviteByUserId = 0,
     this.inviteByUserName = "",
     this.inviteByUserIconId = 0,
