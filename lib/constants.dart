@@ -130,3 +130,15 @@ const double visualDensityNum = 3.0;
 const int groupsLoadNum = 10;
 // number of users returned per request
 const int groupUsersLoadNum = 20;
+
+Color getBackGroundColor(bool hasRead, bool hasAccept) {
+  if (!hasRead) {
+    return pinkLightColor;
+  }
+
+  if (!hasAccept) {
+    return pinkHeavyColor;
+  }
+
+  return greenColor;
+}

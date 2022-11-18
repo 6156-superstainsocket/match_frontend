@@ -44,7 +44,7 @@ class _GroupMainState extends State<GroupMain> {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(
-                icon: Icon(Icons.message), label: "Message"),
+                icon: Icon(Icons.notifications), label: "Message"),
           ],
           elevation: 0,
           currentIndex: _selectedIndex,
