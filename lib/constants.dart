@@ -1,4 +1,5 @@
 import 'package:demo/models/tag.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -142,3 +143,9 @@ Color getBackGroundColor(bool hasRead, bool hasAccept) {
 
   return greenColor;
 }
+
+var userDio = Dio(
+  BaseOptions(
+    baseUrl: 'http://35.92.13.195:8000',
+  ),
+);

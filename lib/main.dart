@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
           actionTextColor: pinkHeavyColor,
         ),
       ),
-      home: const GroupMain(),
+      home: const Login(),
     );
   }
 }

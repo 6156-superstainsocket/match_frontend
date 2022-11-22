@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:demo/constants.dart';
+import 'package:demo/models/customresponse.dart';
 import 'package:demo/models/user.dart';
 import 'package:demo/src/pages/utils/center_background.dart';
 import 'package:demo/src/pages/utils/icon_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   final User user;
@@ -23,6 +28,22 @@ class _ProfileState extends State<Profile> {
     changedUser = widget.user;
   }
 
+  Future<void> updateProfile(int userId) async {
+    Response response = await userDio.put('/users/$userId', data: changedUser);
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != 200) {
+      throw Exception('error: ${data.message}');
+    }
+    debugPrint('${data.message}');
+  }
+
+  Future<void> _saveUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString('userStr', jsonEncode(changedUser));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +56,7 @@ class _ProfileState extends State<Profile> {
           builder: (context) {
             return IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context, changedUser);
                 },
                 icon: const Icon(Icons.arrow_back_outlined));
           },
@@ -44,9 +65,14 @@ class _ProfileState extends State<Profile> {
         actions: [
           TextButton(
               onPressed: () {
-                // TODO save the change
                 if (_profileformKey.currentState!.validate()) {
-                  Navigator.of(context).pop();
+                  try {
+                    updateProfile(changedUser.id);
+                  } on DioError catch (e) {
+                    debugPrint('${e.response}');
+                  }
+                  _saveUser();
+                  Navigator.pop(context, changedUser);
                 }
               },
               child: const Text('Save'))
