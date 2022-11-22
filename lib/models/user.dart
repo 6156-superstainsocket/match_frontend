@@ -7,16 +7,16 @@ part 'user.g.dart';
 class User {
   int id;
 
-  @JsonKey(defaultValue: "")
+  @JsonKey(defaultValue: "", name: 'first_name')
   String? firstName;
 
-  @JsonKey(defaultValue: "")
+  @JsonKey(defaultValue: "", name: 'last_name')
   String? lastName;
 
   @JsonKey(defaultValue: "")
   String? email;
 
-  @JsonKey(defaultValue: 0)
+  @JsonKey(defaultValue: 0, name: 'iconid')
   int? iconId;
 
   @JsonKey(defaultValue: "")

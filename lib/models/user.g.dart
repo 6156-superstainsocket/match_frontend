@@ -8,10 +8,10 @@ part of 'user.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
       id: json['id'] as int,
-      firstName: json['firstName'] as String? ?? '',
-      lastName: json['lastName'] as String? ?? '',
+      firstName: json['first_name'] as String? ?? '',
+      lastName: json['last_name'] as String? ?? '',
       email: json['email'] as String? ?? '',
-      iconId: json['iconId'] as int? ?? 0,
+      iconId: json['iconid'] as int? ?? 0,
       description: json['description'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       tags: (json['tags'] as List<dynamic>?)
@@ -22,10 +22,10 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,
-      'firstName': instance.firstName,
-      'lastName': instance.lastName,
+      'first_name': instance.firstName,
+      'last_name': instance.lastName,
       'email': instance.email,
-      'iconId': instance.iconId,
+      'iconid': instance.iconId,
       'description': instance.description,
       'phone': instance.phone,
       'tags': instance.tags,

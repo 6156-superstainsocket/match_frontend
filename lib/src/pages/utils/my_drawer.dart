@@ -1,25 +1,35 @@
+import 'dart:convert';
 import 'package:demo/constants.dart';
 import 'package:demo/models/user.dart';
 import 'package:demo/src/pages/user/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDrawer extends StatefulWidget {
-  final int userId;
-  const MyDrawer({super.key, required this.userId});
+  const MyDrawer({super.key});
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  User user = User(id: 0);
+  User user = User(id: -1);
 
   @override
   void initState() {
     super.initState();
-    user.id = widget.userId;
-    // TODO: initial user data
-    setState(() {});
+    _loadUser();
+  }
+
+  _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String userStr = prefs.getString('userStr') ?? '';
+    if (userStr != '') {
+      Map<String, dynamic> userJson = jsonDecode(userStr);
+      setState(() {
+        user = User.fromJson(userJson);
+      });
+    }
   }
 
   @override
@@ -41,8 +51,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   const SizedBox(height: 0.5 * defaultPadding),
                   TextButton(
                     style: TextButton.styleFrom(backgroundColor: Colors.white),
-                    onPressed: (() {
-                      Navigator.push(
+                    onPressed: (() async {
+                      User changedUser = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) {
@@ -52,6 +62,9 @@ class _MyDrawerState extends State<MyDrawer> {
                           },
                         ),
                       );
+                      setState(() {
+                        user = changedUser;
+                      });
                     }),
                     child: const Text('Edit Profile'),
                   ),
