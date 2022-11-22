@@ -139,9 +139,8 @@ class _EditTagState extends State<EditTag> {
                                   ),
                                   const SizedBox(height: 0.5 * defaultPadding),
                                   Expanded(
-                                    child: Text(
-                                        "${user.firstName!} ${user.lastName!}",
-                                        style: textLargeSize),
+                                    child:
+                                        Text(user.name!, style: textLargeSize),
                                   )
                                 ],
                               ),

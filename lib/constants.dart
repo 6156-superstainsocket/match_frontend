@@ -1,7 +1,9 @@
 import 'package:demo/models/tag.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 const pinkColor = Color(0xFFF2C6C2);
 const pinkLightColor = Color(0xFFF2E8DF);
@@ -148,4 +150,23 @@ var userDio = Dio(
   BaseOptions(
     baseUrl: 'http://35.92.13.195:8000',
   ),
+);
+
+GoogleSignIn googleSignIn = GoogleSignIn(
+  clientId:
+      '246328411502-hje0geis0508eq3r4h9hlh6k891v4pk2.apps.googleusercontent.com',
+  scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);
+
+FirebaseOptions firebaseOptions = const FirebaseOptions(
+  apiKey: "AIzaSyByMbF2VRN8ZCOGmLqfMYmnjYNXhUokNko",
+  authDomain: "match-70b31.firebaseapp.com",
+  projectId: "match-70b31",
+  storageBucket: "match-70b31.appspot.com",
+  messagingSenderId: "246328411502",
+  appId: "1:246328411502:web:eeaca6a571234d4a086d7f",
+  measurementId: "G-8RY2N0GVCE",
 );

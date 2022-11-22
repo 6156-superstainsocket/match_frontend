@@ -23,41 +23,19 @@ class GroupUsers extends StatefulWidget {
 }
 
 class _GroupUsersState extends State<GroupUsers> {
-  static final User loadingTag =
-      User(id: -1, firstName: "", lastName: "", iconId: -1, email: "");
+  static final User loadingTag = User(id: -1, name: "", iconId: -1, email: "");
   var _users = <User>[loadingTag];
   final _fakeUsers = <User>[
     User(
         id: 1,
-        firstName: "user",
-        lastName: "1",
+        name: "user",
         email: "user1@xxx.com",
         iconId: 1,
         tags: defaultTags),
-    User(
-        id: 2,
-        firstName: "user",
-        lastName: "2",
-        email: "user1@xxx.com",
-        iconId: 2),
-    User(
-        id: 3,
-        firstName: "user",
-        lastName: "3",
-        email: "user1@xxx.com",
-        iconId: 3),
-    User(
-        id: 4,
-        firstName: "user",
-        lastName: "4",
-        email: "user1@xxx.com",
-        iconId: 4),
-    User(
-        id: 5,
-        firstName: "user",
-        lastName: "5",
-        email: "user1@xxx.com",
-        iconId: 5),
+    User(id: 2, name: "user", email: "user1@xxx.com", iconId: 2),
+    User(id: 3, name: "user", email: "user1@xxx.com", iconId: 3),
+    User(id: 4, name: "user", email: "user1@xxx.com", iconId: 4),
+    User(id: 5, name: "user", email: "user1@xxx.com", iconId: 5),
   ];
   String searchString = "";
 
@@ -145,7 +123,7 @@ class _GroupUsersState extends State<GroupUsers> {
                       );
                     }
                   }
-                  return ("${_users[index].firstName} ${_users[index].lastName}")
+                  return ("${_users[index].name}")
                           .toLowerCase()
                           .contains(searchString)
                       ? ListTile(
@@ -158,7 +136,7 @@ class _GroupUsersState extends State<GroupUsers> {
                           title: Row(
                             children: [
                               Text(
-                                "${_users[index].firstName} ${_users[index].lastName}",
+                                "${_users[index].name}",
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(
@@ -229,7 +207,7 @@ class _GroupUsersState extends State<GroupUsers> {
                       : Container();
                 },
                 separatorBuilder: (context, index) {
-                  return ("${_users[index].firstName} ${_users[index].lastName}")
+                  return ("${_users[index].name}")
                           .toLowerCase()
                           .contains(searchString)
                       ? const Divider(

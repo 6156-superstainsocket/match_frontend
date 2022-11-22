@@ -1,7 +1,9 @@
 import 'package:demo/src/pages/login/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/utils/have_account.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -15,16 +17,34 @@ class _RegisterFormState extends State<RegisterForm> {
   final _email = TextEditingController();
   final _pwd = TextEditingController();
   final _pwdConfirm = TextEditingController();
-  final _firstname = TextEditingController();
-  final _lastname = TextEditingController();
+  final _name = TextEditingController();
+  GoogleSignInAccount? _currentUser;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<void> signup(BuildContext context) async {
+    _currentUser = await googleSignIn.signIn();
+    if (_currentUser != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await _currentUser!.authentication;
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken,
+      );
+
+      // Getting users credential
+      UserCredential result = await auth.signInWithCredential(authCredential);
+      debugPrint(result.user!.email);
+      debugPrint(result.user!.displayName);
+      debugPrint(result.user!.phoneNumber);
+    }
+  }
 
   @override
   void dispose() {
     _email.dispose();
     _pwd.dispose();
     _pwdConfirm.dispose();
-    _firstname.dispose();
-    _lastname.dispose();
+    _name.dispose();
     super.dispose();
   }
 
@@ -34,35 +54,19 @@ class _RegisterFormState extends State<RegisterForm> {
         key: _formKey,
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                    child: TextFormField(
-                  controller: _firstname,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    hintText: "Firstname",
-                  ),
-                  validator: (value) {
-                    return value!.trim().isNotEmpty ? null : "Empty field";
-                  },
-                )),
-                const SizedBox(
-                  width: 20.0,
-                ),
-                Flexible(
-                    child: TextFormField(
-                  controller: _lastname,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    hintText: "Lastname",
-                  ),
-                  validator: (value) {
-                    return value!.trim().isNotEmpty ? null : "Empty field";
-                  },
-                ))
-              ],
+            TextFormField(
+              controller: _name,
+              keyboardType: TextInputType.name,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                hintText: "Name",
+                prefixIcon: Icon(Icons.person),
+              ),
+              validator: (value) {
+                return value!.trim().isNotEmpty
+                    ? null
+                    : "Please enter your name";
+              },
             ),
             const SizedBox(height: defaultPadding),
             TextFormField(
@@ -135,11 +139,32 @@ class _RegisterFormState extends State<RegisterForm> {
                     // debugPrint('email: ${_email.text}');
                     // debugPrint('pwd: ${_pwd.text}');
                     // debugPrint('pwd: ${_pwdConfirm.text}');
-                    // debugPrint('firstname: ${_firstname.text}');
-                    // debugPrint('lastname: ${_lastname.text}');
+                    // debugPrint('firstname: ${_name.text}');
                   }
                 },
                 child: const Text('Sign Up'),
+              ),
+            ),
+            const Text('or'),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  signup(context);
+                },
+                label: const Text('Sign Up with Google'),
+                icon: Image.asset(
+                  "assets/images/google.png",
+                  width: tagWidth,
+                  height: tagHeight,
+                  fit: BoxFit.scaleDown,
+                ),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: pinkColor),
+                ),
               ),
             ),
             const SizedBox(height: defaultPadding),

@@ -1,13 +1,15 @@
 import 'dart:convert';
 
 import 'package:demo/models/customresponse.dart';
-import 'package:demo/models/user.dart';
+import 'package:demo/models/user.dart' as match_user;
 import 'package:demo/src/pages/group/group_main.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/utils/have_account.dart';
 import 'package:demo/src/pages/register/register.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatefulWidget {
@@ -21,6 +23,31 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _pwd = TextEditingController();
+  GoogleSignInAccount? _currentUser;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> signin(BuildContext context) async {
+    _currentUser = await googleSignIn.signIn();
+    if (_currentUser != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await _currentUser!.authentication;
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken,
+      );
+
+      // Getting users credential
+      UserCredential result = await auth.signInWithCredential(authCredential);
+      debugPrint(result.user!.email);
+      debugPrint(result.user!.displayName);
+      debugPrint(result.user!.phoneNumber);
+    }
+  }
 
   @override
   void dispose() {
@@ -35,7 +62,7 @@ class _LoginFormState extends State<LoginForm> {
     if (response.statusCode != 200) {
       throw Exception('error: ${data.message}');
     }
-    User user = User.fromJson(data.data);
+    match_user.User user = match_user.User.fromJson(data.data);
 
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('userStr', jsonEncode(user));
@@ -114,6 +141,28 @@ class _LoginFormState extends State<LoginForm> {
                 child: const Text('Sign In'),
               ),
             ),
+            const Text('or'),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  signin(context);
+                },
+                label: const Text('Sign In with Google'),
+                icon: Image.asset(
+                  "assets/images/google.png",
+                  width: tagWidth,
+                  height: tagHeight,
+                  fit: BoxFit.scaleDown,
+                ),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: pinkColor),
+                ),
+              ),
+            ),
             const SizedBox(height: defaultPadding),
             AlreadyHaveAnAccountCheck(press: () {
               Navigator.pushReplacement(
@@ -124,7 +173,7 @@ class _LoginFormState extends State<LoginForm> {
                   },
                 ),
               );
-            })
+            }),
           ],
         ));
   }

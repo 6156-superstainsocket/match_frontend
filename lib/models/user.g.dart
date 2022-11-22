@@ -8,8 +8,7 @@ part of 'user.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
       id: json['id'] as int,
-      firstName: json['first_name'] as String? ?? '',
-      lastName: json['last_name'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       email: json['email'] as String? ?? '',
       iconId: json['iconid'] as int? ?? 0,
       description: json['description'] as String? ?? '',
@@ -18,15 +17,16 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      isGoogle: json['isGoogle'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,
-      'first_name': instance.firstName,
-      'last_name': instance.lastName,
+      'name': instance.name,
       'email': instance.email,
       'iconid': instance.iconId,
       'description': instance.description,
       'phone': instance.phone,
+      'isGoogle': instance.isGoogle,
       'tags': instance.tags,
     };
