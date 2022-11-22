@@ -7,11 +7,8 @@ part 'user.g.dart';
 class User {
   int id;
 
-  @JsonKey(defaultValue: "", name: 'first_name')
-  String? firstName;
-
-  @JsonKey(defaultValue: "", name: 'last_name')
-  String? lastName;
+  @JsonKey(defaultValue: "", name: 'name')
+  String? name;
 
   @JsonKey(defaultValue: "")
   String? email;
@@ -25,17 +22,20 @@ class User {
   @JsonKey(defaultValue: "")
   String? phone;
 
+  @JsonKey(defaultValue: false)
+  bool? isGoogle;
+
   List<Tag>? tags;
 
   User({
     required this.id,
-    this.firstName = '',
-    this.lastName = '',
+    this.name = '',
     this.email = '',
     this.iconId = 0,
     this.description = '',
     this.phone = '',
     this.tags = const [],
+    this.isGoogle = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

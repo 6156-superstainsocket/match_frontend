@@ -1,10 +1,14 @@
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/group/group_main.dart';
 import 'package:demo/src/pages/login/login.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'package:demo/src/pages/login/login.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: firebaseOptions,
+  );
   runApp(const MyApp());
 }
 

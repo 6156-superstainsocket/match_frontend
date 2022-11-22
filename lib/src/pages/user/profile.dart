@@ -133,71 +133,32 @@ class _ProfileState extends State<Profile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'FirstName',
+                                'Name',
                                 style: textMiddleSize,
                                 textAlign: TextAlign.left,
                               ),
                               const SizedBox(height: 0.5 * defaultPadding),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: changedUser.firstName,
+                                  initialValue: changedUser.name,
                                   textInputAction: TextInputAction.next,
                                   decoration: const InputDecoration(
-                                    hintText: "FirstName",
+                                    hintText: "Name",
                                   ),
                                   validator: (value) {
                                     return value!.trim().isNotEmpty
                                         ? null
-                                        : "please enter firstname";
+                                        : "please enter name";
                                   },
                                   onChanged: (value) {
                                     setState(() {
-                                      changedUser.firstName = value;
+                                      changedUser.name = value;
                                     });
                                   },
                                 ),
                               )
                             ],
                           ),
-                        ),
-                        const SizedBox(
-                          width: defaultPadding,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'LastName',
-                                style: textMiddleSize,
-                                textAlign: TextAlign.left,
-                              ),
-                              const SizedBox(height: 0.5 * defaultPadding),
-                              Expanded(
-                                child: TextFormField(
-                                  initialValue: changedUser.lastName,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: const InputDecoration(
-                                    hintText: "LastName",
-                                  ),
-                                  validator: (value) {
-                                    return value!.trim().isNotEmpty
-                                        ? null
-                                        : "please enter lastname";
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      changedUser.lastName = value;
-                                    });
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 0.5 * defaultPadding),
                         ),
                       ],
                     ),

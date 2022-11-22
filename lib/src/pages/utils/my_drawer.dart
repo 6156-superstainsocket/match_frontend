@@ -74,7 +74,7 @@ class _MyDrawerState extends State<MyDrawer> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.account_circle_outlined),
-              title: Text("${user.firstName} ${user.lastName}"),
+              title: Text("${user.name}"),
             ),
             const Divider(),
             ListTile(
