@@ -1,9 +1,16 @@
+import 'dart:convert';
+
+import 'package:demo/models/customresponse.dart';
+import 'package:demo/src/pages/group/group_main.dart';
 import 'package:demo/src/pages/login/login.dart';
+import 'package:demo/models/user.dart' as match_user;
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/src/pages/utils/have_account.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -20,8 +27,9 @@ class _RegisterFormState extends State<RegisterForm> {
   final _name = TextEditingController();
   GoogleSignInAccount? _currentUser;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  bool isSignedUp = false;
 
-  Future<void> signup(BuildContext context) async {
+  Future<int> signup(BuildContext context) async {
     _currentUser = await googleSignIn.signIn();
     if (_currentUser != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -32,11 +40,27 @@ class _RegisterFormState extends State<RegisterForm> {
       );
 
       // Getting users credential
-      UserCredential result = await auth.signInWithCredential(authCredential);
-      debugPrint(result.user!.email);
-      debugPrint(result.user!.displayName);
-      debugPrint(result.user!.phoneNumber);
+      UserCredential result;
+      try {
+        result = await auth.signInWithCredential(authCredential);
+      } catch (e) {
+        throw Exception('error: ${e.toString()}');
+      }
+      int userId;
+      try {
+        userId = await register(true, result);
+        debugPrint('$userId');
+      } catch (e) {
+        debugPrint(e.toString());
+        throw Exception('error: ${e.toString()}');
+      }
+      return userId;
     }
+    match_user.User? usr = await loadUser();
+    if (usr != null) {
+      return usr.id;
+    }
+    return -1;
   }
 
   @override
@@ -46,6 +70,65 @@ class _RegisterFormState extends State<RegisterForm> {
     _pwdConfirm.dispose();
     _name.dispose();
     super.dispose();
+  }
+
+  Future<int> register(bool isGoogle, UserCredential? userCredential) async {
+    Response response;
+    if (!isGoogle) {
+      response = await userDio.post('/users/register', data: {
+        "name": _name.text,
+        "username": _email.text,
+        "email": _email.text,
+        "password": _pwd.text,
+        "is_google": false,
+      });
+    } else {
+      response = await userDio.post('/users/register', data: {
+        "name": userCredential!.user!.displayName,
+        "username": userCredential.user!.email,
+        "email": userCredential.user!.email,
+        "is_google": true,
+      });
+    }
+
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != 200) {
+      throw Exception('error: ${data.message}');
+    }
+    match_user.User user = match_user.User.fromJson(data.data);
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('userId', user.id);
+
+    return user.id;
+  }
+
+  Future<void> getUserInfo(int userId) async {
+    Response response = await userDio.get('/users/$userId');
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != 200) {
+      throw Exception('error: ${data.message}');
+    }
+    match_user.User user = match_user.User.fromJson(data.data);
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('userStr', jsonEncode(user));
+    prefs.setInt('userId', user.id);
+    setState(() {
+      isSignedUp = true;
+    });
+  }
+
+  void _completeRegister() {
+    if (isSignedUp) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      Navigator.pushReplacement<void, void>(
+        context,
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) => const GroupMain(),
+        ),
+      );
+    }
   }
 
   @override
@@ -98,7 +181,7 @@ class _RegisterFormState extends State<RegisterForm> {
               validator: (value) {
                 return value!.trim().length > 5
                     ? null
-                    : "The length of password should be greater than five";
+                    : "The length of password should be greater than 5";
               },
             ),
             Padding(
@@ -128,18 +211,32 @@ class _RegisterFormState extends State<RegisterForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Validate will return true if the form is valid, or false if
                   // the form is invalid.
                   if (_formKey.currentState!.validate()) {
-                    // TODO: Process data.
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                      SnackBar(
+                        duration: const Duration(seconds: 10),
+                        content: Row(
+                          children: const <Widget>[
+                            CircularProgressIndicator(),
+                            Text("  Signing-Up...")
+                          ],
+                        ),
+                      ),
                     );
-                    // debugPrint('email: ${_email.text}');
-                    // debugPrint('pwd: ${_pwd.text}');
-                    // debugPrint('pwd: ${_pwdConfirm.text}');
-                    // debugPrint('firstname: ${_name.text}');
+
+                    try {
+                      await register(false, null).then((value) async {
+                        await getUserInfo(value)
+                            .whenComplete(() => _completeRegister());
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString())),
+                      );
+                    }
                   }
                 },
                 child: const Text('Sign Up'),
@@ -149,8 +246,36 @@ class _RegisterFormState extends State<RegisterForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton.icon(
-                onPressed: () {
-                  signup(context);
+                onPressed: () async {
+                  try {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 10),
+                        content: Row(
+                          children: const <Widget>[
+                            CircularProgressIndicator(),
+                            Text("  Signing-Up...")
+                          ],
+                        ),
+                      ),
+                    );
+
+                    await signup(context).then((value) async {
+                      if (value == -1) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('SignUp with Google failed')),
+                        );
+                        return;
+                      }
+                      await getUserInfo(value)
+                          .whenComplete(() => _completeRegister());
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
                 },
                 label: const Text('Sign Up with Google'),
                 icon: Image.asset(

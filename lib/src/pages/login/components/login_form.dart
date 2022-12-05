@@ -25,13 +25,27 @@ class _LoginFormState extends State<LoginForm> {
   final _pwd = TextEditingController();
   GoogleSignInAccount? _currentUser;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  bool isSignedIn = false;
 
   @override
   void initState() {
     super.initState();
+    _completeLogin();
   }
 
-  Future<void> signin(BuildContext context) async {
+  void _completeLogin() {
+    if (isSignedIn) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      Navigator.pushReplacement<void, void>(
+        context,
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) => const GroupMain(),
+        ),
+      );
+    }
+  }
+
+  Future<int> signin(BuildContext context) async {
     _currentUser = await googleSignIn.signIn();
     if (_currentUser != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -42,11 +56,25 @@ class _LoginFormState extends State<LoginForm> {
       );
 
       // Getting users credential
-      UserCredential result = await auth.signInWithCredential(authCredential);
-      debugPrint(result.user!.email);
-      debugPrint(result.user!.displayName);
-      debugPrint(result.user!.phoneNumber);
+      UserCredential result;
+      try {
+        result = await auth.signInWithCredential(authCredential);
+      } catch (e) {
+        throw Exception('error: ${e.toString()}');
+      }
+      int userId;
+      try {
+        userId = await login(true, result);
+      } catch (e) {
+        throw Exception('error: ${e.toString()}');
+      }
+      return userId;
     }
+    match_user.User? usr = await loadUser();
+    if (usr != null) {
+      return usr.id;
+    }
+    return -1;
   }
 
   @override
@@ -54,6 +82,36 @@ class _LoginFormState extends State<LoginForm> {
     _email.dispose();
     _pwd.dispose();
     super.dispose();
+  }
+
+  Future<int> login(bool isGoogle, UserCredential? userCredential) async {
+    Response response;
+    if (!isGoogle) {
+      response = await userDio.post('/users/login', data: {
+        "username": _email.text,
+        "email": _email.text,
+        "password": _pwd.text,
+        "is_google": false,
+      });
+    } else {
+      response = await userDio.post('/users/login', data: {
+        "username": userCredential!.user!.email,
+        "email": userCredential.user!.email,
+        "password": '',
+        "is_google": true,
+      });
+    }
+
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != 200) {
+      throw Exception('error: ${data.message}');
+    }
+    match_user.User user = match_user.User.fromJson(data.data);
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('userId', user.id);
+
+    return user.id;
   }
 
   Future<void> getUserInfo(int userId) async {
@@ -67,6 +125,9 @@ class _LoginFormState extends State<LoginForm> {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('userStr', jsonEncode(user));
     prefs.setInt('userId', user.id);
+    setState(() {
+      isSignedIn = true;
+    });
   }
 
   @override
@@ -114,28 +175,32 @@ class _LoginFormState extends State<LoginForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Validate will return true if the form is valid, or false if
                   // the form is invalid.
                   if (_formKey.currentState!.validate()) {
-                    // TODO: Process data.
-                    try {
-                      getUserInfo(2);
-                    } on DioError catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(e.message)),
-                      );
-                    }
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return const GroupMain();
-                        },
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 10),
+                        content: Row(
+                          children: const <Widget>[
+                            CircularProgressIndicator(),
+                            Text("  Signing-In...")
+                          ],
+                        ),
                       ),
                     );
-                    debugPrint('email: ${_email.text}');
-                    debugPrint('pwd: ${_pwd.text}');
+
+                    try {
+                      await login(false, null).then((value) async {
+                        await getUserInfo(value)
+                            .whenComplete(() => _completeLogin());
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString())),
+                      );
+                    }
                   }
                 },
                 child: const Text('Sign In'),
@@ -145,8 +210,36 @@ class _LoginFormState extends State<LoginForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: defaultPadding),
               child: ElevatedButton.icon(
-                onPressed: () {
-                  signin(context);
+                onPressed: () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 10),
+                      content: Row(
+                        children: const <Widget>[
+                          CircularProgressIndicator(),
+                          Text("  Signing-In...")
+                        ],
+                      ),
+                    ),
+                  );
+
+                  try {
+                    await signin(context).then((value) async {
+                      if (value == -1) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Login with Google failed')),
+                        );
+                        return;
+                      }
+                      await getUserInfo(value)
+                          .whenComplete(() => _completeLogin());
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
                 },
                 label: const Text('Sign In with Google'),
                 icon: Image.asset(

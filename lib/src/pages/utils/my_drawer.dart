@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:demo/constants.dart';
 import 'package:demo/models/user.dart';
+import 'package:demo/src/pages/login/login.dart';
 import 'package:demo/src/pages/user/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,12 +22,10 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    String userStr = prefs.getString('userStr') ?? '';
-    if (userStr != '') {
-      Map<String, dynamic> userJson = jsonDecode(userStr);
+    User? currentUser = await loadUser();
+    if (currentUser != null) {
       setState(() {
-        user = User.fromJson(userJson);
+        user = currentUser;
       });
     }
   }
@@ -95,7 +93,20 @@ class _MyDrawerState extends State<MyDrawer> {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("Sign Out"),
-              onTap: () {},
+              onTap: () async {
+                SharedPreferences preferences =
+                    await SharedPreferences.getInstance();
+                await preferences.clear().whenComplete(() {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const Login();
+                      },
+                    ),
+                  );
+                });
+              },
             ),
           ],
         ),

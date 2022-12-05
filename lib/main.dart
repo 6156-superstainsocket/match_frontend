@@ -69,6 +69,7 @@ class MyApp extends StatelessWidget {
         snackBarTheme: const SnackBarThemeData(
           backgroundColor: greyBackground,
           actionTextColor: pinkHeavyColor,
+          contentTextStyle: TextStyle(color: pinkHeavyColor),
         ),
       ),
       home: const Login(),
