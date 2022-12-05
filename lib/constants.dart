@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:demo/models/tag.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'models/user.dart';
 
 const pinkColor = Color(0xFFF2C6C2);
 const pinkLightColor = Color(0xFFF2E8DF);
@@ -170,3 +175,14 @@ FirebaseOptions firebaseOptions = const FirebaseOptions(
   appId: "1:246328411502:web:eeaca6a571234d4a086d7f",
   measurementId: "G-8RY2N0GVCE",
 );
+
+Future<User?> loadUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  String userStr = prefs.getString('userStr') ?? '';
+  if (userStr != '') {
+    Map<String, dynamic> userJson = jsonDecode(userStr);
+    User user = User.fromJson(userJson);
+    return user;
+  }
+  return null;
+}

@@ -277,7 +277,7 @@ class _ProfileState extends State<Profile> {
                                   ),
                                   onChanged: (value) {
                                     setState(() {
-                                      changedUser.description = value;
+                                      changedUser.phone = value;
                                     });
                                   },
                                 ),
