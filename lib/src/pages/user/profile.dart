@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:demo/constants.dart';
 import 'package:demo/models/customresponse.dart';
@@ -31,7 +32,7 @@ class _ProfileState extends State<Profile> {
   Future<void> updateProfile(int userId) async {
     Response response = await userDio.put('/users/$userId', data: changedUser);
     CustomResponse data = CustomResponse.fromJson(response.data);
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('error: ${data.message}');
     }
     debugPrint('${data.message}');

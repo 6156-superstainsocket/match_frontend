@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:demo/models/customresponse.dart';
 import 'package:demo/models/user.dart' as match_user;
@@ -50,6 +51,8 @@ class _LoginFormState extends State<LoginForm> {
     if (_currentUser != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
           await _currentUser!.authentication;
+      debugPrint('idtoken ${googleSignInAuthentication.idToken}');
+      debugPrint('idtoken ${googleSignInAuthentication.accessToken}');
       final AuthCredential authCredential = GoogleAuthProvider.credential(
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken,
@@ -62,6 +65,7 @@ class _LoginFormState extends State<LoginForm> {
       } catch (e) {
         throw Exception('error: ${e.toString()}');
       }
+      debugPrint('${result}');
       int userId;
       try {
         userId = await login(true, result);
@@ -103,7 +107,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     CustomResponse data = CustomResponse.fromJson(response.data);
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('error: ${data.message}');
     }
     match_user.User user = match_user.User.fromJson(data.data);
@@ -117,7 +121,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> getUserInfo(int userId) async {
     Response response = await userDio.get('/users/$userId');
     CustomResponse data = CustomResponse.fromJson(response.data);
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('error: ${data.message}');
     }
     match_user.User user = match_user.User.fromJson(data.data);

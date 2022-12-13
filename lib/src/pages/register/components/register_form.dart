@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:demo/models/customresponse.dart';
 import 'package:demo/src/pages/group/group_main.dart';
@@ -92,7 +93,7 @@ class _RegisterFormState extends State<RegisterForm> {
     }
 
     CustomResponse data = CustomResponse.fromJson(response.data);
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('error: ${data.message}');
     }
     match_user.User user = match_user.User.fromJson(data.data);
@@ -106,7 +107,7 @@ class _RegisterFormState extends State<RegisterForm> {
   Future<void> getUserInfo(int userId) async {
     Response response = await userDio.get('/users/$userId');
     CustomResponse data = CustomResponse.fromJson(response.data);
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('error: ${data.message}');
     }
     match_user.User user = match_user.User.fromJson(data.data);
