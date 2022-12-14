@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:demo/models/customresponse.dart';
+import 'package:demo/models/account.dart';
+import 'package:demo/models/token.dart';
 import 'package:demo/models/user.dart' as match_user;
 import 'package:demo/src/pages/group/group_main.dart';
 import 'package:dio/dio.dart';
@@ -51,8 +52,6 @@ class _LoginFormState extends State<LoginForm> {
     if (_currentUser != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
           await _currentUser!.authentication;
-      debugPrint('idtoken ${googleSignInAuthentication.idToken}');
-      debugPrint('idtoken ${googleSignInAuthentication.accessToken}');
       final AuthCredential authCredential = GoogleAuthProvider.credential(
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken,
@@ -65,10 +64,9 @@ class _LoginFormState extends State<LoginForm> {
       } catch (e) {
         throw Exception('error: ${e.toString()}');
       }
-      debugPrint('${result}');
       int userId;
       try {
-        userId = await login(true, result);
+        userId = await oauth2(googleSignInAuthentication.idToken);
       } catch (e) {
         throw Exception('error: ${e.toString()}');
       }
@@ -88,47 +86,58 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  Future<int> login(bool isGoogle, UserCredential? userCredential) async {
+  Future<int> oauth2(String? idToken) async {
     Response response;
-    if (!isGoogle) {
-      response = await userDio.post('/users/login', data: {
-        "username": _email.text,
-        "email": _email.text,
-        "password": _pwd.text,
-        "is_google": false,
-      });
-    } else {
-      response = await userDio.post('/users/login', data: {
-        "username": userCredential!.user!.email,
-        "email": userCredential.user!.email,
-        "password": '',
-        "is_google": true,
-      });
-    }
+    response = await userDio.post('/users/oauth2/', data: {
+      "id_token": idToken,
+    });
 
-    CustomResponse data = CustomResponse.fromJson(response.data);
+    Token data = Token.fromJson(response.data);
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error: ${data.message}');
+      throw Exception('error: ${data.detail}');
     }
-    match_user.User user = match_user.User.fromJson(data.data);
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('userId', user.id);
+    prefs.setInt('userId', data.user!.id);
+    prefs.setString('accessToken', data.access!);
+    prefs.setString('freshToken', data.refresh!);
 
-    return user.id;
+    debugPrint('token ${data.access!}');
+    return data.user!.id;
+  }
+
+  Future<int> login() async {
+    Response response;
+    response = await userDio.post('/users/token/', data: {
+      "username": _email.text,
+      "email": _email.text,
+      "password": _pwd.text,
+    });
+
+    Token data = Token.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('userId', data.user!.id);
+    prefs.setString('accessToken', data.access!);
+    prefs.setString('freshToken', data.refresh!);
+
+    debugPrint('token ${data.access!}');
+    return data.user!.id;
   }
 
   Future<void> getUserInfo(int userId) async {
     Response response = await userDio.get('/users/$userId');
-    CustomResponse data = CustomResponse.fromJson(response.data);
+    Account data = Account.fromJson(response.data);
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error: ${data.message}');
+      throw Exception('error: ${data.detail}');
     }
-    match_user.User user = match_user.User.fromJson(data.data);
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userStr', jsonEncode(user));
-    prefs.setInt('userId', user.id);
+    prefs.setString('userStr', jsonEncode(data.profile));
+    prefs.setInt('userId', data.profile!.id);
     setState(() {
       isSignedIn = true;
     });
@@ -167,9 +176,9 @@ class _LoginFormState extends State<LoginForm> {
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
-                return value!.trim().length > 5
+                return value!.trim().isNotEmpty
                     ? null
-                    : "The length of password should be greater than five";
+                    : "The length of password cannot be empty";
               },
             ),
             Padding(
@@ -196,7 +205,7 @@ class _LoginFormState extends State<LoginForm> {
                     );
 
                     try {
-                      await login(false, null).then((value) async {
+                      await login().then((value) async {
                         await getUserInfo(value)
                             .whenComplete(() => _completeLogin());
                       });

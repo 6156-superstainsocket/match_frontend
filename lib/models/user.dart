@@ -22,10 +22,13 @@ class User {
   @JsonKey(defaultValue: "")
   String? phone;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: false, name: 'is_google')
   bool? isGoogle;
 
   List<Tag>? tags;
+
+  @JsonKey(defaultValue: 0, name: 'user')
+  int userId;
 
   User({
     required this.id,
@@ -36,6 +39,7 @@ class User {
     this.phone = '',
     this.tags = const [],
     this.isGoogle = false,
+    this.userId = 0,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
