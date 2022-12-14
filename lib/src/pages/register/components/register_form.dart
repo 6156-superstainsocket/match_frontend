@@ -180,9 +180,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 prefixIcon: Icon(Icons.password),
               ),
               validator: (value) {
-                return value!.trim().length > 5
+                return value!.trim().isNotEmpty
                     ? null
-                    : "The length of password should be greater than 5";
+                    : "The length of password cannot be empty";
               },
             ),
             Padding(

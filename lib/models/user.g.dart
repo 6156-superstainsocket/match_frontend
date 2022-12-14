@@ -17,7 +17,8 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
               ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      isGoogle: json['isGoogle'] as bool? ?? false,
+      isGoogle: json['is_google'] as bool? ?? false,
+      userId: json['user'] as int? ?? 0,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -27,6 +28,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'iconid': instance.iconId,
       'description': instance.description,
       'phone': instance.phone,
-      'isGoogle': instance.isGoogle,
+      'is_google': instance.isGoogle,
       'tags': instance.tags,
+      'user': instance.userId,
     };
