@@ -11,15 +11,19 @@ class Group {
   @JsonKey(defaultValue: "")
   String? description;
 
-  @JsonKey(defaultValue: 0)
+  @JsonKey(defaultValue: 0, name: "icon_id")
   int? iconId;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: false, name: "allow_without_approval")
   bool? allowWithoutApproval;
 
+  @JsonKey(name: "tags")
   List<Tag>? customTags;
 
   int id;
+
+  @JsonKey(name: "admin_user_id")
+  int? adminUserId;
 
   Group({
     required this.id,
@@ -28,6 +32,7 @@ class Group {
     this.iconId = 0,
     this.allowWithoutApproval = false,
     this.customTags = const [],
+    this.adminUserId = -1,
   });
 
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);

@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
+import 'package:demo/models/group_list_response.dart';
 import 'package:demo/src/pages/group/group_create.dart';
 import 'package:demo/src/pages/group/group_users.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class GroupList extends StatefulWidget {
@@ -22,14 +26,14 @@ class _GroupListState extends State<GroupList> {
     Group(id: 5, name: "Group 5", iconId: 5, description: "description 5"),
   ];
   String searchString = "";
+  int pageOffset = 0;
+  int totalCount = 0;
 
   @override
   void initState() {
     super.initState();
     // TODO: initial data
-    setState(() {
-      _groupsName.insertAll(_groupsName.length - 1, _fakeWords);
-    });
+    _retrieveData();
   }
 
   @override
@@ -97,7 +101,7 @@ class _GroupListState extends State<GroupList> {
               itemBuilder: (context, index) {
                 // reach bottom
                 if (_groupsName[index].id == loadingTag.id) {
-                  if (_groupsName.length - 1 < 15) {
+                  if (_groupsName.length - 1 < totalCount) {
                     // TODO: retrieve data, replace 15 with total groups num
                     _retrieveData();
                     return Container(
@@ -167,11 +171,28 @@ class _GroupListState extends State<GroupList> {
     );
   }
 
-  void _retrieveData() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
-      setState(() {
-        _groupsName.insertAll(_groupsName.length - 1, _fakeWords);
-      });
+  void _retrieveData() async {
+    // Future.delayed(const Duration(seconds: 2)).then((value) async {
+    //   setState(() {
+    //     _groupsName.insertAll(_groupsName.length - 1, _fakeWords);
+    //   });
+    // });
+
+    Response response;
+    response =
+        await groupDio.get('/groups?offset=$pageOffset&limit=$groupsLoadNum');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error HTTP Code: ${response.statusCode}');
+    }
+
+    GroupListResponse groupListResponse =
+        GroupListResponse.fromJson(response.data);
+
+    totalCount = groupListResponse.count!;
+    pageOffset += groupsLoadNum;
+
+    setState(() {
+      _groupsName.insertAll(_groupsName.length - 1, groupListResponse.results!);
     });
   }
 }

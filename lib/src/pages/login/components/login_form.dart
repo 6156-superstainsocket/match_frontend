@@ -101,6 +101,7 @@ class _LoginFormState extends State<LoginForm> {
     prefs.setInt('userId', data.user!.id);
     prefs.setString('accessToken', data.access!);
     prefs.setString('freshToken', data.refresh!);
+    groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
 
     debugPrint('token ${data.access!}');
     return data.user!.id;
@@ -123,6 +124,7 @@ class _LoginFormState extends State<LoginForm> {
     prefs.setInt('userId', data.user!.id);
     prefs.setString('accessToken', data.access!);
     prefs.setString('freshToken', data.refresh!);
+    groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
 
     debugPrint('token ${data.access!}');
     return data.user!.id;
