@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
 import 'package:demo/src/pages/group/custom_tags.dart';
 import 'package:demo/src/pages/group/default_tags.dart';
 import 'package:demo/src/pages/utils/icon_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class GroupCreate extends StatefulWidget {
@@ -25,7 +28,7 @@ class _GroupCreateState extends State<GroupCreate> {
           builder: (context) {
             return IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop(false);
                 },
                 icon: const Icon(Icons.close_outlined));
           },
@@ -159,6 +162,11 @@ class _SettingFormState extends State<SettingForm> {
                               changedGroupSetting.description = value;
                             });
                           },
+                          validator: (value) {
+                            return value!.trim().isNotEmpty
+                                ? null
+                                : "Please enter group description";
+                          },
                         ),
                       )
                     ],
@@ -280,7 +288,8 @@ class _SettingFormState extends State<SettingForm> {
                   // debugPrint(
                   //     "Group Allow: ${changedGroupSetting.allowWithoutApproval}");
                   // debugPrint("Group Icon ID: ${changedGroupSetting.iconId}");
-                  Navigator.of(context).pop();
+                  _sendGroupData()
+                      .whenComplete(() => Navigator.of(context).pop(true));
                 }
               },
               child: const Text('Create'),
@@ -289,5 +298,14 @@ class _SettingFormState extends State<SettingForm> {
         ],
       ),
     );
+  }
+
+  Future<void> _sendGroupData() async {
+    Response response;
+    response =
+        await groupDio.post('/groups', data: changedGroupSetting.toJson());
+    if (response.statusCode != HttpStatus.created) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
   }
 }

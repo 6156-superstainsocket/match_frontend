@@ -18,13 +18,6 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   static final Group loadingTag = Group(id: -1);
   var _groupsName = <Group>[loadingTag];
-  final _fakeWords = <Group>[
-    Group(id: 1, name: "Group 1", iconId: 1, description: "description 1"),
-    Group(id: 2, name: "Group 2", iconId: 2, description: "description 2"),
-    Group(id: 3, name: "Group 3", iconId: 3, description: "description 3"),
-    Group(id: 4, name: "Group 4", iconId: 4, description: "description 4"),
-    Group(id: 5, name: "Group 5", iconId: 5, description: "description 5"),
-  ];
   String searchString = "";
   int pageOffset = 0;
   int totalCount = 0;
@@ -32,7 +25,6 @@ class _GroupListState extends State<GroupList> {
   @override
   void initState() {
     super.initState();
-    // TODO: initial data
     _retrieveData();
   }
 
@@ -77,18 +69,25 @@ class _GroupListState extends State<GroupList> {
                 left: 0.5 * defaultPadding,
                 right: defaultPadding,
               ),
-              onPressed: () => {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (context) {
-                    return const FractionallySizedBox(
-                      heightFactor: popContainerHeightFactor,
-                      child: GroupCreate(),
-                    );
-                  },
-                )
-              },
+              onPressed: (() => {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return const FractionallySizedBox(
+                          heightFactor: popContainerHeightFactor,
+                          child: GroupCreate(),
+                        );
+                      },
+                    ).then((refresh) {
+                      if (refresh) {
+                        setState(() {
+                          pageOffset = 0;
+                          _groupsName = <Group>[loadingTag];
+                        });
+                      }
+                    })
+                  }),
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],
@@ -102,7 +101,6 @@ class _GroupListState extends State<GroupList> {
                 // reach bottom
                 if (_groupsName[index].id == loadingTag.id) {
                   if (_groupsName.length - 1 < totalCount) {
-                    // TODO: retrieve data, replace 15 with total groups num
                     _retrieveData();
                     return Container(
                       padding: const EdgeInsets.all(defaultPadding),
@@ -172,17 +170,11 @@ class _GroupListState extends State<GroupList> {
   }
 
   void _retrieveData() async {
-    // Future.delayed(const Duration(seconds: 2)).then((value) async {
-    //   setState(() {
-    //     _groupsName.insertAll(_groupsName.length - 1, _fakeWords);
-    //   });
-    // });
-
     Response response;
     response =
         await groupDio.get('/groups?offset=$pageOffset&limit=$groupsLoadNum');
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error HTTP Code: ${response.statusCode}');
+      throw Exception('Error HTTP Code: ${response.statusCode}');
     }
 
     GroupListResponse groupListResponse =
@@ -191,8 +183,11 @@ class _GroupListState extends State<GroupList> {
     totalCount = groupListResponse.count!;
     pageOffset += groupsLoadNum;
 
-    setState(() {
-      _groupsName.insertAll(_groupsName.length - 1, groupListResponse.results!);
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _groupsName.insertAll(
+            _groupsName.length - 1, groupListResponse.results!);
+      });
     });
   }
 }
