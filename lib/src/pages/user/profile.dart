@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:demo/constants.dart';
-import 'package:demo/models/customresponse.dart';
-import 'package:demo/models/user.dart';
+import 'package:demo/models/account.dart';
 import 'package:demo/src/pages/utils/center_background.dart';
 import 'package:demo/src/pages/utils/icon_picker.dart';
 import 'package:dio/dio.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
-  final User user;
+  final Account user;
   const Profile({super.key, required this.user});
 
   @override
@@ -21,7 +20,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final GlobalKey<FormState> _profileformKey = GlobalKey<FormState>();
 
-  User changedUser = User(id: -1);
+  Account changedUser = Account(id: -1);
 
   @override
   void initState() {
@@ -30,12 +29,12 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> updateProfile(int userId) async {
-    Response response = await userDio.put('/users/$userId', data: changedUser);
-    CustomResponse data = CustomResponse.fromJson(response.data);
+    Response response = await userDio
+        .put('/users/$userId', data: {"profile": changedUser.profile});
+    Account data = Account.fromJson(response.data);
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error: ${data.message}');
+      throw Exception('error: ${data.detail}');
     }
-    debugPrint('${data.message}');
   }
 
   Future<void> _saveUser() async {
@@ -57,7 +56,7 @@ class _ProfileState extends State<Profile> {
           builder: (context) {
             return IconButton(
                 onPressed: () {
-                  Navigator.pop(context, changedUser);
+                  Navigator.pop(context);
                 },
                 icon: const Icon(Icons.arrow_back_outlined));
           },
@@ -68,7 +67,7 @@ class _ProfileState extends State<Profile> {
               onPressed: () {
                 if (_profileformKey.currentState!.validate()) {
                   try {
-                    updateProfile(changedUser.id);
+                    updateProfile(changedUser.profile!.userId);
                   } on DioError catch (e) {
                     debugPrint('${e.response}');
                   }
@@ -96,18 +95,18 @@ class _ProfileState extends State<Profile> {
                           onPressed: () async {
                             int? result = await showIconPicker(
                               context: context,
-                              defalutIconId: changedUser.iconId,
+                              defalutIconId: changedUser.profile!.iconId,
                               isIcon: false,
                               svgs: allUserIcons,
                               crossCount: 3,
                             );
                             setState(() {
-                              changedUser.iconId = result!;
+                              changedUser.profile!.iconId = result!;
                             });
                           },
                           icon: ClipOval(
                             child: Image.asset(
-                              "$assetUserPath${(changedUser.iconId! + 1).toString()}.png",
+                              "$assetUserPath${(changedUser.profile!.iconId! + 1).toString()}.png",
                               width: profileImgWidth,
                               height: profileImgHeight,
                               fit: BoxFit.scaleDown,
@@ -141,7 +140,7 @@ class _ProfileState extends State<Profile> {
                               const SizedBox(height: 0.5 * defaultPadding),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: changedUser.name,
+                                  initialValue: changedUser.profile!.name,
                                   textInputAction: TextInputAction.next,
                                   decoration: const InputDecoration(
                                     hintText: "Name",
@@ -153,7 +152,7 @@ class _ProfileState extends State<Profile> {
                                   },
                                   onChanged: (value) {
                                     setState(() {
-                                      changedUser.name = value;
+                                      changedUser.profile!.name = value;
                                     });
                                   },
                                 ),
@@ -189,14 +188,15 @@ class _ProfileState extends State<Profile> {
                               const SizedBox(height: 0.5 * defaultPadding),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: changedUser.description,
+                                  initialValue:
+                                      changedUser.profile!.description,
                                   textInputAction: TextInputAction.next,
                                   decoration: const InputDecoration(
                                     hintText: "Describe about yourself",
                                   ),
                                   onChanged: (value) {
                                     setState(() {
-                                      changedUser.description = value;
+                                      changedUser.profile!.description = value;
                                     });
                                   },
                                 ),
@@ -271,14 +271,14 @@ class _ProfileState extends State<Profile> {
                               const SizedBox(height: 0.5 * defaultPadding),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: changedUser.phone,
+                                  initialValue: changedUser.profile!.phone,
                                   textInputAction: TextInputAction.done,
                                   decoration: const InputDecoration(
                                     hintText: "XXX-XXX-XXXX",
                                   ),
                                   onChanged: (value) {
                                     setState(() {
-                                      changedUser.phone = value;
+                                      changedUser.profile!.phone = value;
                                     });
                                   },
                                 ),

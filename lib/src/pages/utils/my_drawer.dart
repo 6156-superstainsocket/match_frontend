@@ -1,5 +1,5 @@
 import 'package:demo/constants.dart';
-import 'package:demo/models/user.dart';
+import 'package:demo/models/account.dart';
 import 'package:demo/src/pages/login/login.dart';
 import 'package:demo/src/pages/user/profile.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +13,7 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  User user = User(id: -1);
+  Account user = Account(id: -1);
 
   @override
   void initState() {
@@ -22,10 +22,10 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   _loadUser() async {
-    User? currentUser = await loadUser();
-    if (currentUser != null) {
+    Account? account = await loadUser();
+    if (account != null && account.profile != null) {
       setState(() {
-        user = currentUser;
+        user = account;
       });
     }
   }
@@ -44,13 +44,13 @@ class _MyDrawerState extends State<MyDrawer> {
               child: Column(
                 children: [
                   ClipOval(
-                    child: allUserIcons[user.iconId!],
+                    child: allUserIcons[user.profile!.iconId!],
                   ),
                   const SizedBox(height: 0.5 * defaultPadding),
                   TextButton(
                     style: TextButton.styleFrom(backgroundColor: Colors.white),
                     onPressed: (() async {
-                      User changedUser = await Navigator.push(
+                      Account? changedUser = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) {
@@ -60,9 +60,11 @@ class _MyDrawerState extends State<MyDrawer> {
                           },
                         ),
                       );
-                      setState(() {
-                        user = changedUser;
-                      });
+                      if (changedUser != null) {
+                        setState(() {
+                          user = changedUser;
+                        });
+                      }
                     }),
                     child: const Text('Edit Profile'),
                   ),
@@ -72,12 +74,12 @@ class _MyDrawerState extends State<MyDrawer> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.account_circle_outlined),
-              title: Text("${user.name}"),
+              title: Text("${user.profile!.name}"),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.description_outlined),
-              title: Text(user.description!),
+              title: Text(user.profile!.description!),
             ),
             const Divider(),
             ListTile(
@@ -87,7 +89,7 @@ class _MyDrawerState extends State<MyDrawer> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.phone_outlined),
-              title: Text(user.phone!),
+              title: Text(user.profile!.phone!),
             ),
             const Divider(),
             ListTile(

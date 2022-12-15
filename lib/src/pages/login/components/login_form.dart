@@ -72,9 +72,9 @@ class _LoginFormState extends State<LoginForm> {
       }
       return userId;
     }
-    match_user.User? usr = await loadUser();
-    if (usr != null) {
-      return usr.id;
+    Account? account = await loadUser();
+    if (account != null) {
+      return account.profile!.id;
     }
     return -1;
   }
@@ -102,6 +102,7 @@ class _LoginFormState extends State<LoginForm> {
     prefs.setString('accessToken', data.access!);
     prefs.setString('freshToken', data.refresh!);
     groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
+    userDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
 
     debugPrint('token ${data.access!}');
     return data.user!.id;
@@ -125,6 +126,7 @@ class _LoginFormState extends State<LoginForm> {
     prefs.setString('accessToken', data.access!);
     prefs.setString('freshToken', data.refresh!);
     groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
+    userDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
 
     debugPrint('token ${data.access!}');
     return data.user!.id;
@@ -137,9 +139,15 @@ class _LoginFormState extends State<LoginForm> {
       throw Exception('error: ${data.detail}');
     }
 
+    if (data.profile == null) {
+      data.profile = match_user.User(id: 0, email: data.email);
+    } else {
+      data.profile!.email = data.email;
+    }
+
+    debugPrint('${data.profile!.toJson()}');
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userStr', jsonEncode(data.profile));
-    prefs.setInt('userId', data.profile!.id);
+    prefs.setString('userStr', jsonEncode(data));
     setState(() {
       isSignedIn = true;
     });
