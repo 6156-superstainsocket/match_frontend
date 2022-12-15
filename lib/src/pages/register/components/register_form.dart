@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:demo/models/customresponse.dart';
+import 'package:demo/models/account.dart';
+import 'package:demo/models/token.dart';
 import 'package:demo/src/pages/group/group_main.dart';
 import 'package:demo/src/pages/login/login.dart';
 import 'package:demo/models/user.dart' as match_user;
@@ -49,7 +50,7 @@ class _RegisterFormState extends State<RegisterForm> {
       }
       int userId;
       try {
-        userId = await register(true, result);
+        userId = await oauth2(googleSignInAuthentication.idToken, result);
         debugPrint('$userId');
       } catch (e) {
         debugPrint(e.toString());
@@ -57,9 +58,9 @@ class _RegisterFormState extends State<RegisterForm> {
       }
       return userId;
     }
-    match_user.User? usr = await loadUser();
-    if (usr != null) {
-      return usr.id;
+    Account? account = await loadUser();
+    if (account != null) {
+      return account.profile!.id;
     }
     return -1;
   }
@@ -73,48 +74,112 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  Future<int> register(bool isGoogle, UserCredential? userCredential) async {
+  Future<int> oauth2(String? idToken, UserCredential result) async {
     Response response;
-    if (!isGoogle) {
-      response = await userDio.post('/users/register', data: {
-        "name": _name.text,
-        "username": _email.text,
-        "email": _email.text,
-        "password": _pwd.text,
-        "is_google": false,
-      });
-    } else {
-      response = await userDio.post('/users/register', data: {
-        "name": userCredential!.user!.displayName,
-        "username": userCredential.user!.email,
-        "email": userCredential.user!.email,
-        "is_google": true,
-      });
-    }
+    response = await userDio.post('/users/oauth2/', data: {
+      "id_token": idToken,
+      "user": Account(
+        id: 0,
+        username: result.user!.displayName,
+        password: "123",
+        email: result.user!.email,
+        profile: match_user.User(
+          id: 0,
+          name: result.user!.displayName,
+          isGoogle: true,
+          phone: "123-456-7890",
+          description: "this is description about me",
+        ),
+      )
+    });
 
-    CustomResponse data = CustomResponse.fromJson(response.data);
+    Token data = Token.fromJson(response.data);
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error: ${data.message}');
+      throw Exception('error: ${data.detail}');
     }
-    match_user.User user = match_user.User.fromJson(data.data);
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('userId', user.id);
+    prefs.setInt('userId', data.user!.id);
+    prefs.setString('accessToken', data.access!);
+    prefs.setString('freshToken', data.refresh!);
+    groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
+    userDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
 
-    return user.id;
+    debugPrint('token ${data.access!}');
+    return data.user!.id;
+  }
+
+  Future<int> register() async {
+    Response response;
+    Account account = Account(
+        id: 0,
+        username: _email.text,
+        email: _email.text,
+        password: _pwd.text,
+        profile: match_user.User(
+          id: 0,
+          name: _name.text,
+          isGoogle: false,
+          phone: "123-456-7890",
+          description: "this is description about me",
+        ));
+    response = await userDio.post('/users/register/', data: account.toJson());
+
+    Token data = Token.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
+
+    int userId;
+
+    try {
+      userId = await getToken(_email.text, _pwd.text);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('error: ${e.toString()}');
+    }
+    return userId;
+  }
+
+  Future<int> getToken(String email, String password) async {
+    Response response;
+    response = await userDio.post('/users/token/', data: {
+      "username": email,
+      "email": email,
+      "password": password,
+    });
+
+    Token data = Token.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('userId', data.user!.id);
+    prefs.setString('accessToken', data.access!);
+    prefs.setString('freshToken', data.refresh!);
+    groupDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
+    userDio.options.headers['Authorization'] = 'Bearer ${data.access!}';
+
+    debugPrint('token ${data.access!}');
+    return data.user!.id;
   }
 
   Future<void> getUserInfo(int userId) async {
     Response response = await userDio.get('/users/$userId');
-    CustomResponse data = CustomResponse.fromJson(response.data);
+    Account data = Account.fromJson(response.data);
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('error: ${data.message}');
+      throw Exception('error: ${data.detail}');
     }
-    match_user.User user = match_user.User.fromJson(data.data);
+
+    if (data.profile == null) {
+      data.profile = match_user.User(id: 0, email: data.email);
+    } else {
+      data.profile!.email = data.email;
+    }
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userStr', jsonEncode(user));
-    prefs.setInt('userId', user.id);
+    prefs.setString('userStr', jsonEncode(data));
     setState(() {
       isSignedUp = true;
     });
@@ -229,7 +294,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     );
 
                     try {
-                      await register(false, null).then((value) async {
+                      await register().then((value) async {
                         await getUserInfo(value)
                             .whenComplete(() => _completeRegister());
                       });
