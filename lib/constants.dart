@@ -135,7 +135,7 @@ final List<Tag> defaultTags = [
 const double visualDensityNum = 3.0;
 
 // number of groups returned per request
-const int groupsLoadNum = 10;
+const int groupsLoadNum = 20;
 // number of users returned per request
 const int groupUsersLoadNum = 20;
 
@@ -188,8 +188,5 @@ Future<User?> loadUser() async {
 }
 
 var groupDio = Dio(
-  BaseOptions(baseUrl: 'http://35.92.13.195:8000', headers: {
-    'Authorization':
-        'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjcxMTYwMjI1LCJpYXQiOjE2NzA1NTU0MjUsImp0aSI6IjEzM2Y5ZjBhMWVkODQxMGFhZWJmNTBjMDczNWFhYjhkIiwidXNlcl9pZCI6MTgsInVzZXIiOnsiaWQiOjE4LCJ1c2VybmFtZSI6Imdyb3VwdGVzdCIsInBhc3N3b3JkIjoicGJrZGYyX3NoYTI1NiQzOTAwMDAkYTFrUlR6WDVMeno5azh5RHowWnBGbyRjQlQwU3QreEwybVFqQ2JGUXVSVUx5Q0duUGJXZVh5dmhWZlA5dzdGM29FPSIsImVtYWlsIjoiZ3JvdXBAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IktsYXVzIiwibGFzdF9uYW1lIjoiTGkiLCJwcm9maWxlIjp7ImlkIjoxNywiaXNfZ29vZ2xlIjpmYWxzZSwibmFtZSI6Im5hbWUgZm9yIHVzZXIyIiwicGhvbmUiOiIxMjM0NTYiLCJkZXNjcmlwdGlvbiI6ImRlc2NyaXB0aW9uIGZvciB1c2VyMiIsImljb25pZCI6MSwidXNlciI6MTh9fX0.uVB8gORaQruDNpfBpNmA231DhPy9vnopubzNkSgxhE0'
-  }),
+  BaseOptions(baseUrl: 'http://35.92.13.195:8000', headers: {}),
 );

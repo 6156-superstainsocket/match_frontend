@@ -13,7 +13,7 @@ class Tag {
   @JsonKey(defaultValue: "")
   String? description;
 
-  @JsonKey(defaultValue: 0)
+  @JsonKey(defaultValue: 0, name: "icon_id")
   int? iconId;
 
   @JsonKey(defaultValue: false)
