@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:demo/src/pages/group/default_tags.dart';
+import 'package:demo/src/pages/group/group_main.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 import 'package:demo/models/group.dart';
 
 class MemberSetting extends StatefulWidget {
-  final int groupId;
-  const MemberSetting({super.key, required this.groupId});
+  final Group groupSetting;
+  const MemberSetting({super.key, required this.groupSetting});
 
   @override
   State<MemberSetting> createState() => _MemberSettingState();
@@ -13,11 +17,32 @@ class MemberSetting extends StatefulWidget {
 
 class _MemberSettingState extends State<MemberSetting> {
   Group groupSetting = Group(id: 0);
+  int userId = 0;
 
   @override
   void initState() {
     super.initState();
-    groupSetting.id = widget.groupId;
+    _retrieveUserId();
+    groupSetting = widget.groupSetting;
+  }
+
+  Future<void> quitGroup() async {
+    Response response;
+    response =
+        await groupDio.delete('/groups/${groupSetting.id}/users/$userId');
+
+    if (response.statusCode != HttpStatus.noContent) {
+      throw Exception('error: httpCode: ${response.statusCode}');
+    }
+  }
+
+  void _retrieveUserId() async {
+    int? currentUserId = await loadUserId();
+    if (currentUserId != null) {
+      setState(() {
+        userId = currentUserId;
+      });
+    }
   }
 
   @override
@@ -71,8 +96,21 @@ class _MemberSettingState extends State<MemberSetting> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // TODO quit the group
-                    Navigator.of(context).pop();
+                    try {
+                      quitGroup().whenComplete(() {
+                        Navigator.pushReplacement<void, void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) =>
+                                const GroupMain(),
+                          ),
+                        );
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString())),
+                      );
+                    }
                   },
                   child: const Text('OK'),
                 ),
@@ -104,16 +142,6 @@ class _MemberSettingFormState extends State<MemberSettingForm> {
   void initState() {
     super.initState();
     changedGroupSetting = widget.groupSetting;
-    changedGroupSetting.customTags = [];
-    if (widget.groupSetting.customTags != null &&
-        widget.groupSetting.customTags!.isNotEmpty) {
-      changedGroupSetting.customTags = [
-        ...defaultTags,
-        ...widget.groupSetting.customTags!
-      ];
-    } else {
-      changedGroupSetting.customTags = defaultTags;
-    }
   }
 
   @override

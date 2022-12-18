@@ -58,9 +58,8 @@ class _LoginFormState extends State<LoginForm> {
       );
 
       // Getting users credential
-      UserCredential result;
       try {
-        result = await auth.signInWithCredential(authCredential);
+        await auth.signInWithCredential(authCredential);
       } catch (e) {
         throw Exception('error: ${e.toString()}');
       }

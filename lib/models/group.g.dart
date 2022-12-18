@@ -17,6 +17,7 @@ Group _$GroupFromJson(Map<String, dynamic> json) => Group(
               .toList() ??
           const [],
       adminUserId: json['admin_user_id'] as int? ?? -1,
+      detail: json['detail'] as String? ?? '',
     );
 
 Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
@@ -27,4 +28,5 @@ Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
       'tags': instance.customTags,
       'id': instance.id,
       'admin_user_id': instance.adminUserId,
+      'detail': instance.detail,
     };

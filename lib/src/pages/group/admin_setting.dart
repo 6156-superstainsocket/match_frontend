@@ -1,14 +1,20 @@
+import 'dart:io';
+
+import 'package:demo/models/customresponse.dart';
 import 'package:demo/models/group.dart';
+import 'package:demo/models/tag.dart';
 import 'package:demo/src/pages/group/custom_tags.dart';
 import 'package:demo/src/pages/group/default_tags.dart';
+import 'package:demo/src/pages/group/group_main.dart';
 import 'package:demo/src/pages/utils/icon_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 
 class AdminSetting extends StatefulWidget {
-  const AdminSetting({super.key, required this.groupId});
+  const AdminSetting({super.key, required this.groupSetting});
 
-  final int groupId;
+  final Group groupSetting;
 
   @override
   State<AdminSetting> createState() => _AdminSettingState();
@@ -16,12 +22,26 @@ class AdminSetting extends StatefulWidget {
 
 class _AdminSettingState extends State<AdminSetting> {
   Group groupSetting = Group(id: 0);
+  List<Tag> defaultTags = [];
 
   @override
   void initState() {
-    // TODO: fill group information
     super.initState();
-    groupSetting.id = widget.groupId;
+    groupSetting = widget.groupSetting;
+    defaultTags = widget.groupSetting.customTags!.sublist(0, 3);
+  }
+
+  Future<void> updateGroupInfo() async {
+    List<Tag> allTags = [...defaultTags, ...groupSetting.customTags!];
+    groupSetting.customTags = allTags;
+    Response response;
+    response =
+        await groupDio.patch('/groups/${groupSetting.id}', data: groupSetting);
+
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
   }
 
   @override
@@ -44,9 +64,16 @@ class _AdminSettingState extends State<AdminSetting> {
         toolbarHeight: topMenuBarHeight,
         actions: [
           TextButton(
-              onPressed: () {
-                // TODO save the change
-                Navigator.pop(context);
+              onPressed: () async {
+                try {
+                  await updateGroupInfo().whenComplete(() {
+                    Navigator.pop(context, true);
+                  });
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString())),
+                  );
+                }
               },
               child: const Text('Save'))
         ],
@@ -93,13 +120,27 @@ class SettingForm extends StatefulWidget {
 
 class _SettingFormState extends State<SettingForm> {
   final GlobalKey<FormState> _adminSettingformKey = GlobalKey<FormState>();
-  // TODO: fill group information
   Group changedGroupSetting = Group(id: 0);
 
   @override
   void initState() {
     super.initState();
     changedGroupSetting = widget.groupSetting;
+    if (widget.groupSetting.customTags!.length <= 3) {
+      changedGroupSetting.customTags = [];
+    } else {
+      changedGroupSetting.customTags =
+          widget.groupSetting.customTags!.sublist(3);
+    }
+  }
+
+  Future<void> deleteGroup() async {
+    Response response;
+    response = await groupDio.delete('/groups/${changedGroupSetting.id}');
+
+    if (response.statusCode != HttpStatus.noContent) {
+      throw Exception('error: httpCode: ${response.statusCode}');
+    }
   }
 
   @override
@@ -287,8 +328,21 @@ class _SettingFormState extends State<SettingForm> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO delete the group
-                        Navigator.of(context).pop();
+                        try {
+                          deleteGroup().whenComplete(() {
+                            Navigator.pushReplacement<void, void>(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    const GroupMain(),
+                              ),
+                            );
+                          });
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
                       },
                       child: const Text('OK'),
                     ),

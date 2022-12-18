@@ -10,9 +10,12 @@ class CustomResponse {
   String? message;
 
   @JsonKey(defaultValue: "")
+  String? detail;
+
+  @JsonKey(defaultValue: "")
   String? status;
 
-  CustomResponse({this.data, this.status, this.message});
+  CustomResponse({this.data, this.status, this.message, this.detail});
 
   factory CustomResponse.fromJson(Map<String, dynamic> json) =>
       _$CustomResponseFromJson(json);
