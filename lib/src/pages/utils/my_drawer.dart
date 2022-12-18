@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDrawer extends StatefulWidget {
-  const MyDrawer({super.key});
+  final Account user;
+
+  const MyDrawer({super.key, required this.user});
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
@@ -18,16 +20,7 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   void initState() {
     super.initState();
-    _loadUser();
-  }
-
-  _loadUser() async {
-    Account? account = await loadUser();
-    if (account != null && account.profile != null) {
-      setState(() {
-        user = account;
-      });
-    }
+    user = widget.user;
   }
 
   @override
