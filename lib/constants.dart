@@ -21,6 +21,8 @@ const greyBackground = Color(0xFFF5F5F5);
 const logoTitleFont =
     TextStyle(fontSize: 30, fontWeight: FontWeight.bold, fontFamily: 'Cute');
 
+const double progressIndicatorSize = 40.0;
+
 const double defaultPadding = 16.0;
 const border = BorderRadius.all(Radius.circular(10.0));
 

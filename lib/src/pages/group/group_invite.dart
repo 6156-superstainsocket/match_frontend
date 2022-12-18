@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class GroupInvite extends StatefulWidget {
@@ -44,11 +47,64 @@ class _GroupInviteState extends State<GroupInvite> {
         actions: [
           TextButton(
               onPressed: () {
-                // TODO save the change
                 if (_groupInviteKey.currentState!.validate()) {
-                  // TODO: send data
-                  debugPrint("Invite Emails: ${_invitedEmails.text}");
-                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        child: Center(
+                          child: SizedBox(
+                            width: progressIndicatorSize,
+                            height: progressIndicatorSize,
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                  List<String> emails = _invitedEmails.text
+                      .split(",")
+                      .map((x) => x.trim())
+                      .where((element) =>
+                          element.isNotEmpty &&
+                          RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(element))
+                      .toList();
+                  // debugPrint("Invite Emails: ${_invitedEmails.text}");
+                  // debugPrint("Invite Emails Sent: $emails");
+                  try {
+                    _sendInviteEmails(emails).whenComplete(() {
+                      // pop loading dialog
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          duration: Duration(milliseconds: 2500),
+                          content: Text(
+                            "Send invites successfully!",
+                            style: TextStyle(color: greenColor),
+                          ),
+                        ),
+                      );
+                      Future.delayed(const Duration(seconds: 3), () {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        Navigator.of(context).pop();
+                      });
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          e.toString(),
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Send'))
@@ -88,5 +144,19 @@ class _GroupInviteState extends State<GroupInvite> {
         },
       ),
     );
+  }
+
+  Future<void> _sendInviteEmails(List<String> emails) async {
+    if (emails.isEmpty) {
+      return;
+    }
+
+    Response response;
+    response = await groupDio
+        .post('/groups/${widget.groupId}/users', data: {'emails': emails});
+    // debugPrint('${response.toString()}');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
   }
 }
