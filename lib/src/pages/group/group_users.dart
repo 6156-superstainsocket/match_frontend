@@ -199,7 +199,7 @@ class _GroupUsersState extends State<GroupUsers> {
                                 return FractionallySizedBox(
                                   heightFactor: popContainerHeightFactor,
                                   child: EditTag(
-                                    userId: _users[index].id,
+                                    user: _users[index],
                                     tags: _users[index].tags!,
                                   ),
                                 );

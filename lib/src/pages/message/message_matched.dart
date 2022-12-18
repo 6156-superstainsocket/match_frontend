@@ -1,6 +1,8 @@
 import 'package:demo/constants.dart';
 import 'package:demo/models/message.dart';
+import 'package:demo/models/user.dart' as match_user;
 import 'package:demo/src/pages/group/edit_tag.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class MessageMatched extends StatefulWidget {
@@ -71,6 +73,16 @@ class _MessageMatchedState extends State<MessageMatched> {
     if (mounted) {
       super.setState(fn);
     }
+  }
+
+  Future<match_user.User?> getGroupUserInfo(int groupId, int userId) async {
+    Response response;
+    response = await groupDio.get('/groups/$groupId/users/$userId');
+
+    // Token data = Token.fromJson(response.data);
+    // if (response.statusCode != HttpStatus.ok) {
+    //   throw Exception('error: ${data.detail}');
+    // }
   }
 
   @override
@@ -187,20 +199,30 @@ class _MessageMatchedState extends State<MessageMatched> {
                   setState(() {
                     _messagesMatch[index].hasRead = true;
                   });
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) {
-                      return FractionallySizedBox(
-                        heightFactor: popContainerHeightFactor,
-                        child: EditTag(
-                          userId: _messagesMatch[index].userId!,
-                          tags: const [],
-                          showTags: false,
-                        ),
-                      );
-                    },
-                  );
+                  try {
+                    getGroupUserInfo(_messagesMatch[index].groupId!,
+                            _messagesMatch[index].userId!)
+                        .then(
+                      (value) => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) {
+                          return FractionallySizedBox(
+                            heightFactor: popContainerHeightFactor,
+                            child: EditTag(
+                              user: value!,
+                              tags: const [],
+                              showTags: false,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
                 },
               );
             }),
