@@ -25,6 +25,9 @@ class Group {
   @JsonKey(name: "admin_user_id")
   int? adminUserId;
 
+  @JsonKey(defaultValue: "")
+  String? detail;
+
   Group({
     required this.id,
     this.name = '',
@@ -33,6 +36,7 @@ class Group {
     this.allowWithoutApproval = false,
     this.customTags = const [],
     this.adminUserId = -1,
+    this.detail = '',
   });
 
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);

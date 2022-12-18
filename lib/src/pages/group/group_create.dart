@@ -162,11 +162,6 @@ class _SettingFormState extends State<SettingForm> {
                               changedGroupSetting.description = value;
                             });
                           },
-                          validator: (value) {
-                            return value!.trim().isNotEmpty
-                                ? null
-                                : "Please enter group description";
-                          },
                         ),
                       )
                     ],
@@ -280,7 +275,6 @@ class _SettingFormState extends State<SettingForm> {
             child: ElevatedButton(
               onPressed: () {
                 if (_adminSettingformKey.currentState!.validate()) {
-                  // TODO: send data
                   // debugPrint("Group ID: ${changedGroupSetting.id}");
                   // debugPrint("Group Name: ${changedGroupSetting.name}");
                   // debugPrint(

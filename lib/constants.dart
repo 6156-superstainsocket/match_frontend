@@ -186,6 +186,15 @@ Future<Account?> loadUser() async {
   return null;
 }
 
+Future<int?> loadUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  int userId = prefs.getInt('userId') ?? -1;
+  if (userId != -1) {
+    return userId;
+  }
+  return null;
+}
+
 var groupDio = Dio(
   BaseOptions(
       baseUrl:

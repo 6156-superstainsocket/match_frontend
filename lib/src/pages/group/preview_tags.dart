@@ -42,17 +42,24 @@ class _PreviewTagsState extends State<PreviewTags> {
           return SizedBox(
             child: Row(
               children: [
-                Column(
-                  children: [
-                    Icon(
-                      widget.tagIcons[widget.tags[index].iconId!],
-                      size: tagHeight,
-                      color: pinkHeavyColor,
-                    ),
-                    Text(widget.tags[index].name!, style: tagRedTextStyle),
-                  ],
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Icon(
+                        widget.tagIcons[widget.tags[index].iconId!],
+                        size: tagHeight,
+                        color: pinkHeavyColor,
+                      ),
+                      Text(
+                        widget.tags[index].name!,
+                        style: tagRedTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(flex: 1),
+                const SizedBox(width: defaultPadding),
                 Expanded(
                   flex: 4,
                   child: Text(

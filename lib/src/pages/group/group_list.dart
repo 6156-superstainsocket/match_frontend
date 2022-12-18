@@ -21,11 +21,13 @@ class _GroupListState extends State<GroupList> {
   String searchString = "";
   int pageOffset = 0;
   int totalCount = 0;
+  int userId = 0;
 
   @override
   void initState() {
     super.initState();
     _retrieveData();
+    _retrieveUserId();
   }
 
   @override
@@ -80,9 +82,10 @@ class _GroupListState extends State<GroupList> {
                         );
                       },
                     ).then((refresh) {
-                      if (refresh) {
+                      if (refresh != null && refresh) {
                         setState(() {
                           pageOffset = 0;
+                          totalCount += 1;
                           _groupsName = <Group>[loadingTag];
                         });
                       }
@@ -137,7 +140,8 @@ class _GroupListState extends State<GroupList> {
                           _groupsName[index].name!,
                         ),
                         onTap: () {
-                          debugPrint("Group ID ${_groupsName[index].id}");
+                          debugPrint(
+                              "Group ID ${_groupsName[index].id} userId $userId");
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: ((context) {
@@ -147,9 +151,18 @@ class _GroupListState extends State<GroupList> {
                                 groupName: _groupsName[index].name!,
                                 groupDescription:
                                     _groupsName[index].description!,
+                                isAdmin:
+                                    _groupsName[index].adminUserId == userId,
                               );
                             })),
-                          );
+                          ).then((refresh) {
+                            if (refresh != null && refresh) {
+                              setState(() {
+                                pageOffset = 0;
+                                _groupsName = <Group>[loadingTag];
+                              });
+                            }
+                          });
                         },
                       )
                     : Container();
@@ -167,6 +180,15 @@ class _GroupListState extends State<GroupList> {
         ),
       ],
     );
+  }
+
+  void _retrieveUserId() async {
+    int? currentUserId = await loadUserId();
+    if (currentUserId != null) {
+      setState(() {
+        userId = currentUserId;
+      });
+    }
   }
 
   void _retrieveData() async {

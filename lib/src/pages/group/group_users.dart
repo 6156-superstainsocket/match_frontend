@@ -6,17 +6,20 @@ import 'package:demo/src/pages/group/overview_menu.dart';
 import 'package:flutter/material.dart';
 
 class GroupUsers extends StatefulWidget {
-  const GroupUsers(
-      {super.key,
-      required this.groupId,
-      required this.groupIconId,
-      required this.groupName,
-      required this.groupDescription});
+  const GroupUsers({
+    super.key,
+    required this.groupId,
+    required this.groupIconId,
+    required this.groupName,
+    required this.groupDescription,
+    required this.isAdmin,
+  });
 
   final int groupId;
   final int groupIconId;
   final String groupName;
   final String groupDescription;
+  final bool isAdmin;
 
   @override
   State<GroupUsers> createState() => _GroupUsersState();
@@ -63,7 +66,7 @@ class _GroupUsersState extends State<GroupUsers> {
         groupName: widget.groupName,
         groupDescription: widget.groupDescription,
         groupId: widget.groupId,
-        isAdmin: true,
+        isAdmin: widget.isAdmin,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,

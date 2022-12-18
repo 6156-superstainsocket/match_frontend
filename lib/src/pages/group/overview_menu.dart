@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:demo/models/group.dart';
 import 'package:demo/src/pages/group/admin_setting.dart';
 import 'package:demo/src/pages/group/group_invite.dart';
 import 'package:demo/src/pages/group/member_setting.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 
@@ -27,22 +31,45 @@ class OverviewMenu extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _OverviewMenuState extends State<OverviewMenu> {
+  Group groupInfo = Group(id: 0);
+  bool isGroupInfoChanged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    groupInfo.id = widget.groupId;
+    groupInfo.iconId = widget.groupIconId;
+    groupInfo.name = widget.groupName;
+    groupInfo.description = widget.groupDescription;
+  }
+
+  Future<Group> getGroupInfo(int groupId) async {
+    Response response;
+    response = await groupDio.get('/groups/$groupId');
+
+    Group data = Group.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
+
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(children: [
         Column(children: [
-          // const Padding(padding: EdgeInsets.only(top: 0.5 * defaultPadding)),
-          allGroupIcons[widget.groupIconId],
+          allGroupIcons[groupInfo.iconId!],
           const Text('xx members',
               textAlign: TextAlign.left, style: textSmallSize)
         ]),
         Expanded(
           child: Column(
             children: [
-              Text(widget.groupName,
+              Text(groupInfo.name!,
                   textAlign: TextAlign.left, style: textLargeSize),
-              Text(widget.groupDescription,
+              Text(groupInfo.description!,
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
                   style: textSmallSize),
@@ -57,7 +84,7 @@ class _OverviewMenuState extends State<OverviewMenu> {
         builder: (context) {
           return IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, isGroupInfoChanged);
               },
               icon: const Icon(Icons.arrow_back_ios_new));
         },
@@ -78,24 +105,42 @@ class _OverviewMenuState extends State<OverviewMenu> {
             },
             icon: const Icon(Icons.add_circle_outline)),
         IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (context) {
-                  return FractionallySizedBox(
-                    heightFactor: popContainerHeightFactor,
-                    // TODO: replace 0 with group id
-                    child: widget.isAdmin
-                        ? AdminSetting(
-                            groupId: widget.groupId,
-                          )
-                        : MemberSetting(
-                            groupId: widget.groupId,
-                          ),
-                  );
-                },
-              );
+            onPressed: () async {
+              try {
+                await getGroupInfo(widget.groupId).then((value) async {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      return FractionallySizedBox(
+                        heightFactor: popContainerHeightFactor,
+                        child: widget.isAdmin
+                            ? AdminSetting(
+                                groupSetting: value,
+                              )
+                            : MemberSetting(
+                                groupSetting: value,
+                              ),
+                      );
+                    },
+                  ).then((refresh) async {
+                    if (refresh != null && refresh) {
+                      await getGroupInfo(widget.groupId).then(
+                        (value) {
+                          setState(() {
+                            groupInfo = value;
+                            isGroupInfoChanged = true;
+                          });
+                        },
+                      );
+                    }
+                  });
+                });
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(e.toString())),
+                );
+              }
             },
             icon: const Icon(Icons.settings_outlined)),
       ],
