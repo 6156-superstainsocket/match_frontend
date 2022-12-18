@@ -193,8 +193,8 @@ class _GroupListState extends State<GroupList> {
 
   void _retrieveData() async {
     Response response;
-    response =
-        await groupDio.get('/groups?offset=$pageOffset&limit=$groupsLoadNum');
+    response = await groupDio.get(
+        '/groups?offset=$pageOffset&limit=$groupsLoadNum&order=-created_at');
     if (response.statusCode != HttpStatus.ok) {
       throw Exception('Error HTTP Code: ${response.statusCode}');
     }
