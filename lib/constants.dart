@@ -118,17 +118,17 @@ const double dialogHeight = 400;
 final List<Tag> defaultTags = [
   Tag(
     name: 'dinner',
-    description: 'I want to have dinner with her/him',
+    description: 'I want to have dinner with her/him/they',
     iconId: 0,
   ),
   Tag(
     name: 'date',
-    description: 'I want to date her/him',
+    description: 'I want to date her/him/they',
     iconId: 1,
   ),
   Tag(
     name: 'study',
-    description: 'I want to study with her/him',
+    description: 'I want to study with her/him/they',
     iconId: 2,
   ),
 ];
@@ -159,8 +159,7 @@ var userDio = Dio(
 );
 
 GoogleSignIn googleSignIn = GoogleSignIn(
-  clientId:
-      '246328411502-hje0geis0508eq3r4h9hlh6k891v4pk2.apps.googleusercontent.com',
+  clientId: '246328411502-hje0geis0508eq3r4h9hlh6k891v4pk2',
   scopes: [
     'email',
     'https://www.googleapis.com/auth/contacts.readonly',

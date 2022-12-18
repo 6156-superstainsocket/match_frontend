@@ -1,4 +1,5 @@
 import 'package:demo/constants.dart';
+import 'package:demo/models/account.dart';
 import 'package:demo/src/pages/group/group_list.dart';
 import 'package:demo/src/pages/message/message_bar.dart';
 import 'package:demo/src/pages/utils/my_drawer.dart';
@@ -19,6 +20,22 @@ class _GroupMainState extends State<GroupMain> {
     GroupList(),
     MessageBar(),
   ];
+  Account user = Account(id: -1);
+
+  _loadUser() async {
+    Account? account = await loadUser();
+    if (account != null && account.profile != null) {
+      setState(() {
+        user = account;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +43,7 @@ class _GroupMainState extends State<GroupMain> {
       appBar: LogoMenu(
         menuTitle: _barTitles[_selectedIndex],
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(user: user),
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,
