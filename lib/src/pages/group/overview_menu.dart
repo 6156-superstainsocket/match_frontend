@@ -9,19 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:demo/constants.dart';
 
 class OverviewMenu extends StatefulWidget implements PreferredSizeWidget {
-  const OverviewMenu(
-      {super.key,
-      required this.groupId,
-      required this.isAdmin,
-      required this.groupIconId,
-      required this.groupName,
-      required this.groupDescription});
+  const OverviewMenu({
+    super.key,
+    required this.groupId,
+    required this.isAdmin,
+    required this.groupIconId,
+    required this.groupName,
+    required this.groupDescription,
+    required this.memberCount,
+  });
 
   final int groupId;
   final bool isAdmin;
   final int groupIconId;
   final String groupName;
   final String groupDescription;
+  final int memberCount;
 
   @override
   State<OverviewMenu> createState() => _OverviewMenuState();
@@ -61,7 +64,7 @@ class _OverviewMenuState extends State<OverviewMenu> {
       title: Row(children: [
         Column(children: [
           allGroupIcons[groupInfo.iconId!],
-          const Text('xx members',
+          Text('${widget.memberCount} members',
               textAlign: TextAlign.left, style: textSmallSize)
         ]),
         Expanded(
