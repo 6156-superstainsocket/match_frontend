@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
+import 'package:demo/models/group_user.dart';
+import 'package:demo/models/group_user_list_response.dart';
 import 'package:demo/models/tag.dart';
 import 'package:demo/models/user.dart';
 import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:demo/src/pages/group/overview_menu.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class GroupUsers extends StatefulWidget {
@@ -26,29 +31,17 @@ class GroupUsers extends StatefulWidget {
 }
 
 class _GroupUsersState extends State<GroupUsers> {
-  static final User loadingTag = User(id: -1, name: "", iconId: -1, email: "");
-  var _users = <User>[loadingTag];
-  final _fakeUsers = <User>[
-    User(
-        id: 1,
-        name: "user",
-        email: "user1@xxx.com",
-        iconId: 1,
-        tags: defaultTags),
-    User(id: 2, name: "user", email: "user1@xxx.com", iconId: 2),
-    User(id: 3, name: "user", email: "user1@xxx.com", iconId: 3),
-    User(id: 4, name: "user", email: "user1@xxx.com", iconId: 4),
-    User(id: 5, name: "user", email: "user1@xxx.com", iconId: 5),
-  ];
+  static final GroupUser loadingTag = GroupUser(
+      user: User(userId: -1, name: "", iconId: -1, email: "", id: -1));
+  var _users = <GroupUser>[loadingTag];
   String searchString = "";
+  int pageOffset = 0;
+  int totalCount = 0;
 
   @override
   void initState() {
     super.initState();
-    // TODO: initial data
-    setState(() {
-      _users.insertAll(_users.length - 1, _fakeUsers);
-    });
+    _retrieveGroupUserData();
   }
 
   @override
@@ -102,9 +95,8 @@ class _GroupUsersState extends State<GroupUsers> {
                 itemCount: _users.length,
                 itemBuilder: (context, index) {
                   // reach bottom
-                  if (_users[index].id == loadingTag.id) {
-                    if (_users.length - 1 < 15) {
-                      // TODO: retrieve data, replace 15 with total groups user num
+                  if (_users[index].user!.userId == loadingTag.user!.userId) {
+                    if (_users.length - 1 < totalCount) {
                       _retrieveGroupUserData();
                       return Container(
                         padding: const EdgeInsets.all(defaultPadding),
@@ -126,7 +118,7 @@ class _GroupUsersState extends State<GroupUsers> {
                       );
                     }
                   }
-                  return ("${_users[index].name}")
+                  return ("${_users[index].user!.name}")
                           .toLowerCase()
                           .contains(searchString)
                       ? ListTile(
@@ -134,12 +126,12 @@ class _GroupUsersState extends State<GroupUsers> {
                             vertical: visualDensityNum,
                           ),
                           leading: ClipOval(
-                            child: allUserIcons[_users[index].iconId!],
+                            child: allUserIcons[_users[index].user!.iconId!],
                           ),
                           title: Row(
                             children: [
                               Text(
-                                "${_users[index].name}",
+                                "${_users[index].user!.name}",
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(
@@ -191,7 +183,7 @@ class _GroupUsersState extends State<GroupUsers> {
                             ],
                           ),
                           onTap: () => {
-                            debugPrint("User ID ${_users[index].id}"),
+                            debugPrint("User ID ${_users[index].user!.userId}"),
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
@@ -199,7 +191,7 @@ class _GroupUsersState extends State<GroupUsers> {
                                 return FractionallySizedBox(
                                   heightFactor: popContainerHeightFactor,
                                   child: EditTag(
-                                    user: _users[index],
+                                    user: _users[index].user!,
                                     tags: _users[index].tags!,
                                   ),
                                 );
@@ -210,7 +202,7 @@ class _GroupUsersState extends State<GroupUsers> {
                       : Container();
                 },
                 separatorBuilder: (context, index) {
-                  return ("${_users[index].name}")
+                  return ("${_users[index].user!.name}")
                           .toLowerCase()
                           .contains(searchString)
                       ? const Divider(
@@ -225,10 +217,23 @@ class _GroupUsersState extends State<GroupUsers> {
     );
   }
 
-  void _retrieveGroupUserData() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
+  void _retrieveGroupUserData() async {
+    Response response;
+    response = await groupDio.get(
+        '/groups/${widget.groupId}/users?offset=$pageOffset&limit=$groupUsersLoadNum');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
+
+    GroupUserListResponse groupUserListResponse =
+        GroupUserListResponse.fromJson(response.data);
+
+    totalCount = groupUserListResponse.count!;
+    pageOffset += groupUsersLoadNum;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        _users.insertAll(_users.length - 1, _fakeUsers);
+        _users.insertAll(_users.length - 1, groupUserListResponse.results!);
       });
     });
   }
