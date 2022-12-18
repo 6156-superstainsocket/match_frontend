@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
+import 'package:demo/models/group_user.dart';
 import 'package:demo/models/message.dart';
 import 'package:demo/models/user.dart' as match_user;
 import 'package:demo/src/pages/group/edit_tag.dart';
@@ -79,10 +82,11 @@ class _MessageMatchedState extends State<MessageMatched> {
     Response response;
     response = await groupDio.get('/groups/$groupId/users/$userId');
 
-    // Token data = Token.fromJson(response.data);
-    // if (response.statusCode != HttpStatus.ok) {
-    //   throw Exception('error: ${data.detail}');
-    // }
+    GroupUser data = GroupUser.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
+    }
+    return data.user;
   }
 
   @override
