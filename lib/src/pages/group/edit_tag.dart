@@ -4,12 +4,12 @@ import 'package:demo/models/user.dart';
 import 'package:flutter/material.dart';
 
 class EditTag extends StatefulWidget {
-  final int userId;
+  final User user;
   final List<Tag> tags;
   final bool? showTags;
   const EditTag({
     super.key,
-    required this.userId,
+    required this.user,
     required this.tags,
     this.showTags = true,
   });
@@ -30,7 +30,7 @@ class _EditTagState extends State<EditTag> {
   @override
   void initState() {
     super.initState();
-    user.id = widget.userId;
+    user = widget.user;
 
     if (widget.tags.isNotEmpty) {
       previewTags = widget.tags;
