@@ -199,7 +199,6 @@ Future<int?> loadUserId() async {
 
 var groupDio = Dio(
   BaseOptions(
-      baseUrl:
-          'http://match-group-microservice-dev.us-east-1.elasticbeanstalk.com/api',
+      baseUrl: 'https://a31ow36s4g.execute-api.us-east-1.amazonaws.com/api',
       headers: {'Access-Control-Allow-Origin': '*'}),
 );
