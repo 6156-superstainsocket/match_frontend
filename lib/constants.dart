@@ -154,7 +154,8 @@ Color getBackGroundColor(bool hasRead, bool hasAccept) {
 
 var userDio = Dio(
   BaseOptions(
-    baseUrl: 'http://54.175.24.99:8000',
+    baseUrl: 'https://ecmyhc1u8f.execute-api.us-east-1.amazonaws.com',
+    headers: {'Access-Control-Allow-Origin': '*'},
   ),
 );
 
@@ -200,5 +201,5 @@ var groupDio = Dio(
   BaseOptions(
       baseUrl:
           'http://match-group-microservice-dev.us-east-1.elasticbeanstalk.com/api',
-      headers: {}),
+      headers: {'Access-Control-Allow-Origin': '*'}),
 );
