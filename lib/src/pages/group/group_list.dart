@@ -42,165 +42,169 @@ class _GroupListState extends State<GroupList> {
 
   @override
   Widget build(BuildContext context) {
-    return !initialized
-        ? Container(
-            padding: const EdgeInsets.all(defaultPadding),
-            alignment: Alignment.center,
-            child: const SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: CircularProgressIndicator(strokeWidth: 2.0),
-            ),
-          )
-        : Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: defaultPadding,
-                        right: 0.5 * defaultPadding,
-                      ),
-                      child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            searchString = value.toLowerCase();
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          labelText: 'Search',
-                          suffixIcon: Icon(Icons.search),
+    return RefreshIndicator(
+      onRefresh: _pullRefresh,
+      child: !initialized
+          ? Container(
+              padding: const EdgeInsets.all(defaultPadding),
+              alignment: Alignment.center,
+              child: const SizedBox(
+                width: 24.0,
+                height: 24.0,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: defaultPadding,
+                          right: 0.5 * defaultPadding,
+                        ),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              searchString = value.toLowerCase();
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Search',
+                            suffixIcon: Icon(Icons.search),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    padding: const EdgeInsets.only(
-                      left: 0.5 * defaultPadding,
-                      right: defaultPadding,
-                    ),
-                    onPressed: (() => {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) {
-                              return const FractionallySizedBox(
-                                heightFactor: popContainerHeightFactor,
-                                child: GroupCreate(),
-                              );
-                            },
-                          ).then((refresh) {
-                            if (refresh != null && refresh) {
-                              setState(() {
-                                pageOffset = 0;
-                                totalCount += 1;
-                                _groupsName = <Group>[loadingTag];
-                              });
-                            }
-                          })
-                        }),
-                    icon: const Icon(Icons.add_circle_outline),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Groups List
-              Expanded(
-                child: ListView.separated(
-                    itemCount: _groupsName.length,
-                    itemBuilder: (context, index) {
-                      // reach bottom
-                      if (_groupsName[index].id == loadingTag.id) {
-                        if (_groupsName.length - 1 < totalCount) {
-                          _retrieveData();
-                          return Container(
-                            padding: const EdgeInsets.all(defaultPadding),
-                            alignment: Alignment.center,
-                            child: const SizedBox(
-                              width: 24.0,
-                              height: 24.0,
-                              child:
-                                  CircularProgressIndicator(strokeWidth: 2.0),
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.all(defaultPadding),
-                            child: const Text(
-                              "Hit Bottom",
-                              style: TextStyle(color: greyColor),
-                            ),
-                          );
-                        }
-                      }
-                      return _groupsName[index]
-                              .name!
-                              .toLowerCase()
-                              .contains(searchString)
-                          ? ListTile(
-                              visualDensity: const VisualDensity(
-                                vertical: visualDensityNum,
-                              ),
-                              leading: ClipOval(
-                                child:
-                                    allGroupIcons[_groupsName[index].iconId!],
-                              ),
-                              title: Text(
-                                _groupsName[index].name!,
-                              ),
-                              onTap: () {
-                                debugPrint(
-                                    "Group ID ${_groupsName[index].id} userId $userId");
-                                _retrieveGroupUserData(_groupsName[index].id)
-                                    .whenComplete(() {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: ((context) {
-                                      return GroupUsers(
-                                        groupId: _groupsName[index].id,
-                                        groupIconId: _groupsName[index].iconId!,
-                                        groupName: _groupsName[index].name!,
-                                        groupDescription:
-                                            _groupsName[index].description!,
-                                        isAdmin:
-                                            _groupsName[index].adminUserId ==
-                                                userId,
-                                        memberCount: userCount,
-                                        userId: userId,
-                                      );
-                                    })),
-                                  ).then((refresh) {
-                                    if (refresh != null && refresh) {
-                                      setState(() {
-                                        pageOffset = 0;
-                                        _groupsName = <Group>[loadingTag];
-                                      });
-                                    }
-                                  });
-                                });
+                    IconButton(
+                      padding: const EdgeInsets.only(
+                        left: 0.5 * defaultPadding,
+                        right: defaultPadding,
+                      ),
+                      onPressed: (() => {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) {
+                                return const FractionallySizedBox(
+                                  heightFactor: popContainerHeightFactor,
+                                  child: GroupCreate(),
+                                );
                               },
-                            )
-                          : Container();
-                    },
-                    separatorBuilder: (context, index) {
-                      return _groupsName[index]
-                              .name!
-                              .toLowerCase()
-                              .contains(searchString)
-                          ? const Divider(
-                              height: 1,
-                            )
-                          : Container();
-                    }),
-              ),
-            ],
-          );
+                            ).then((refresh) {
+                              if (refresh != null && refresh) {
+                                setState(() {
+                                  pageOffset = 0;
+                                  totalCount += 1;
+                                  _groupsName = <Group>[loadingTag];
+                                });
+                              }
+                            })
+                          }),
+                      icon: const Icon(Icons.add_circle_outline),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Groups List
+                Expanded(
+                  child: ListView.separated(
+                      itemCount: _groupsName.length,
+                      itemBuilder: (context, index) {
+                        // reach bottom
+                        if (_groupsName[index].id == loadingTag.id) {
+                          if (_groupsName.length - 1 < totalCount) {
+                            _retrieveData();
+                            return Container(
+                              padding: const EdgeInsets.all(defaultPadding),
+                              alignment: Alignment.center,
+                              child: const SizedBox(
+                                width: 24.0,
+                                height: 24.0,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2.0),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(defaultPadding),
+                              child: const Text(
+                                "Hit Bottom",
+                                style: TextStyle(color: greyColor),
+                              ),
+                            );
+                          }
+                        }
+                        return _groupsName[index]
+                                .name!
+                                .toLowerCase()
+                                .contains(searchString)
+                            ? ListTile(
+                                visualDensity: const VisualDensity(
+                                  vertical: visualDensityNum,
+                                ),
+                                leading: ClipOval(
+                                  child:
+                                      allGroupIcons[_groupsName[index].iconId!],
+                                ),
+                                title: Text(
+                                  _groupsName[index].name!,
+                                ),
+                                onTap: () {
+                                  debugPrint(
+                                      "Group ID ${_groupsName[index].id} userId $userId");
+                                  _retrieveGroupUserData(_groupsName[index].id)
+                                      .whenComplete(() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: ((context) {
+                                        return GroupUsers(
+                                          groupId: _groupsName[index].id,
+                                          groupIconId:
+                                              _groupsName[index].iconId!,
+                                          groupName: _groupsName[index].name!,
+                                          groupDescription:
+                                              _groupsName[index].description!,
+                                          isAdmin:
+                                              _groupsName[index].adminUserId ==
+                                                  userId,
+                                          memberCount: userCount,
+                                          userId: userId,
+                                        );
+                                      })),
+                                    ).then((refresh) {
+                                      if (refresh != null && refresh) {
+                                        setState(() {
+                                          pageOffset = 0;
+                                          _groupsName = <Group>[loadingTag];
+                                        });
+                                      }
+                                    });
+                                  });
+                                },
+                              )
+                            : Container();
+                      },
+                      separatorBuilder: (context, index) {
+                        return _groupsName[index]
+                                .name!
+                                .toLowerCase()
+                                .contains(searchString)
+                            ? const Divider(
+                                height: 1,
+                              )
+                            : Container();
+                      }),
+                ),
+              ],
+            ),
+    );
   }
 
   void _retrieveUserId() async {
@@ -210,6 +214,12 @@ class _GroupListState extends State<GroupList> {
         userId = currentUserId;
       });
     }
+  }
+
+  Future<void> _pullRefresh() async {
+    pageOffset = 0;
+    _groupsName = <Group>[loadingTag];
+    _retrieveData();
   }
 
   void _retrieveData() async {
