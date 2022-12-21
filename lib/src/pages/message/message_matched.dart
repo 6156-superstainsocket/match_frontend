@@ -197,12 +197,13 @@ class _MessageMatchedState extends State<MessageMatched> {
                           ),
                         ),
                         onTap: () {
-                          // debugPrint(
-                          //     "User ID ${_messagesMatch[index].content!.fromUser!.userId}");
-                          setState(() {
-                            _messagesMatch[index].hasRead = true;
-                          });
                           try {
+                            if (!_messagesMatch[index].hasRead) {
+                              updateMatchMessage(_messagesMatch[index].id);
+                              setState(() {
+                                _messagesMatch[index].hasRead = true;
+                              });
+                            }
                             getGroupUserInfo(
                                     _messagesMatch[index].content!.group!.id,
                                     _messagesMatch[index]
