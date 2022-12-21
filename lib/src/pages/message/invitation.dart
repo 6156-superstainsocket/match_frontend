@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:demo/constants.dart';
 import 'package:demo/models/message.dart';
+import 'package:demo/models/message_content.dart';
 import 'package:demo/models/messages.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -96,11 +97,22 @@ class _InvitationState extends State<Invitation> {
                           children: [
                             SlidableAction(
                               onPressed: (context) {
-                                setState(() {
-                                  _messagesName[index].hasRead = true;
+                                try {
+                                  setState(() {
+                                    _messagesName[index].hasRead = true;
+                                    _messagesName[index].content!.hasAccept =
+                                        false;
+                                  });
+                                  _respondeInvite(_messagesName[index].id,
+                                      _messagesName[index].content!);
+                                } catch (e) {
+                                  _messagesName[index].hasRead = false;
                                   _messagesName[index].content!.hasAccept =
                                       false;
-                                });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString())),
+                                  );
+                                }
                               },
                               backgroundColor: pinkHeavyColor,
                               label: 'Deny',
@@ -113,11 +125,24 @@ class _InvitationState extends State<Invitation> {
                           children: [
                             SlidableAction(
                               onPressed: (context) {
-                                setState(() {
-                                  _messagesName[index].hasRead = true;
+                                try {
+                                  setState(() {
+                                    setState(() {
+                                      _messagesName[index].hasRead = true;
+                                      _messagesName[index].content!.hasAccept =
+                                          true;
+                                    });
+                                  });
+                                  _respondeInvite(_messagesName[index].id,
+                                      _messagesName[index].content!);
+                                } catch (e) {
+                                  _messagesName[index].hasRead = false;
                                   _messagesName[index].content!.hasAccept =
-                                      true;
-                                });
+                                      false;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString())),
+                                  );
+                                }
                               },
                               backgroundColor: greenColor,
                               label: 'Accept',
@@ -212,6 +237,29 @@ class _InvitationState extends State<Invitation> {
               ],
             ),
     );
+  }
+
+  Future<void> _respondeInvite(
+    String messageId,
+    MessageContent messageContent,
+  ) async {
+    if (messageContent.hasAccept) {
+      Response groupResponse = await groupDio.put(
+          '/groups/${messageContent.group!.id}/users/${messageContent.toUser!.userId}');
+      if (groupResponse.statusCode != HttpStatus.ok) {
+        throw Exception('error: $groupResponse');
+      }
+    }
+
+    Response response = await messageDio.patch('/messages', data: {
+      "id": messageId,
+      "has_read": true,
+      "content": messageContent.toJson(),
+    });
+
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: $response');
+    }
   }
 
   Future<void> _pullRefresh() async {
