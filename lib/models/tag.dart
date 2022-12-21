@@ -16,7 +16,7 @@ class Tag {
   @JsonKey(defaultValue: 0, name: "icon_id")
   int? iconId;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: false, name: "is_match")
   bool? isMatch;
 
   Tag({

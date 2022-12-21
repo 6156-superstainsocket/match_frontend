@@ -11,7 +11,7 @@ Tag _$TagFromJson(Map<String, dynamic> json) => Tag(
       name: json['name'] as String? ?? '',
       description: json['description'] as String? ?? '',
       iconId: json['icon_id'] as int? ?? 0,
-      isMatch: json['isMatch'] as bool? ?? false,
+      isMatch: json['is_match'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
@@ -19,5 +19,5 @@ Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
       'icon_id': instance.iconId,
-      'isMatch': instance.isMatch,
+      'is_match': instance.isMatch,
     };

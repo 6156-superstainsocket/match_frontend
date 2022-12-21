@@ -22,6 +22,7 @@ class _MessageMatchedState extends State<MessageMatched> {
   var _messagesMatch = <Message>[loadingTag];
   int pageOffset = 0;
   int totalCount = 0;
+  bool initialized = false;
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _MessageMatchedState extends State<MessageMatched> {
 
   @override
   Widget build(BuildContext context) {
-    return _messagesMatch.isEmpty || _messagesMatch[0].type == -1
+    return !initialized
         ? Container(
             padding: const EdgeInsets.all(defaultPadding),
             alignment: Alignment.center,
@@ -246,6 +247,7 @@ class _MessageMatchedState extends State<MessageMatched> {
       setState(() {
         _messagesMatch.insertAll(
             _messagesMatch.length - 1, messagesResponse.content!);
+        initialized = true;
       });
     });
   }

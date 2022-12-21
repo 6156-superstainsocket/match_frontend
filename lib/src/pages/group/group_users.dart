@@ -19,6 +19,7 @@ class GroupUsers extends StatefulWidget {
     required this.groupDescription,
     required this.isAdmin,
     required this.memberCount,
+    required this.userId,
   });
 
   final int groupId;
@@ -27,6 +28,7 @@ class GroupUsers extends StatefulWidget {
   final String groupDescription;
   final bool isAdmin;
   final int memberCount;
+  final int userId;
 
   @override
   State<GroupUsers> createState() => _GroupUsersState();
@@ -39,11 +41,14 @@ class _GroupUsersState extends State<GroupUsers> {
   String searchString = "";
   int pageOffset = 0;
   int totalCount = 0;
+  List<Tag> groupTags = [];
+  bool initialized = false;
 
   @override
   void initState() {
     super.initState();
     _retrieveGroupUserData();
+    _retrieveGroupTags();
   }
 
   @override
@@ -64,7 +69,7 @@ class _GroupUsersState extends State<GroupUsers> {
         isAdmin: widget.isAdmin,
         memberCount: widget.memberCount,
       ),
-      body: _users.isEmpty || _users[0].user!.userId == -1
+      body: !initialized
           ? Container(
               padding: const EdgeInsets.all(defaultPadding),
               alignment: Alignment.center,
@@ -137,6 +142,8 @@ class _GroupUsersState extends State<GroupUsers> {
                                 .toLowerCase()
                                 .contains(searchString)
                             ? ListTile(
+                                enabled:
+                                    widget.userId != _users[index].user!.userId,
                                 visualDensity: const VisualDensity(
                                   vertical: visualDensityNum,
                                 ),
@@ -215,10 +222,20 @@ class _GroupUsersState extends State<GroupUsers> {
                                         child: EditTag(
                                           user: _users[index].user!,
                                           tags: _users[index].tags!,
+                                          groupId: widget.groupId,
+                                          allTags: groupTags,
                                         ),
                                       );
                                     },
-                                  )
+                                  ).then((refresh) {
+                                    if (refresh != null && refresh) {
+                                      setState(() {
+                                        pageOffset = 0;
+                                        totalCount += 1;
+                                        _users = <GroupUser>[loadingTag];
+                                      });
+                                    }
+                                  })
                                 },
                               )
                             : Container();
@@ -256,7 +273,23 @@ class _GroupUsersState extends State<GroupUsers> {
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _users.insertAll(_users.length - 1, groupUserListResponse.results!);
+        initialized = true;
       });
+    });
+  }
+
+  void _retrieveGroupTags() async {
+    Response response;
+    response = await groupDio.get('/groups/${widget.groupId}/tags');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
+
+    List<dynamic> temp = response.data.toList();
+    List<Tag> tags = temp.map((value) => Tag.fromJson(value)).toList();
+
+    setState(() {
+      groupTags = tags;
     });
   }
 }

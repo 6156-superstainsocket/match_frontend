@@ -24,6 +24,7 @@ class _GroupListState extends State<GroupList> {
   int totalCount = 0;
   int userId = 0;
   int userCount = 0;
+  bool initialized = false;
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class _GroupListState extends State<GroupList> {
 
   @override
   Widget build(BuildContext context) {
-    return _groupsName.isEmpty || _groupsName[0].id == -1
+    return !initialized
         ? Container(
             padding: const EdgeInsets.all(defaultPadding),
             alignment: Alignment.center,
@@ -171,6 +172,7 @@ class _GroupListState extends State<GroupList> {
                                             _groupsName[index].adminUserId ==
                                                 userId,
                                         memberCount: userCount,
+                                        userId: userId,
                                       );
                                     })),
                                   ).then((refresh) {
@@ -228,6 +230,7 @@ class _GroupListState extends State<GroupList> {
       setState(() {
         _groupsName.insertAll(
             _groupsName.length - 1, groupListResponse.results!);
+        initialized = true;
       });
     });
   }
