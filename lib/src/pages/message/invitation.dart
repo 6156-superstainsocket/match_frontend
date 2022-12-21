@@ -141,7 +141,7 @@ class _InvitationState extends State<Invitation> {
                                         child: allUserIcons[_messagesName[index]
                                             .content!
                                             .fromUser!
-                                            .id],
+                                            .iconId!],
                                       ),
                                       Expanded(
                                         child: Text(

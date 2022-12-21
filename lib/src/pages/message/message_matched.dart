@@ -205,7 +205,10 @@ class _MessageMatchedState extends State<MessageMatched> {
                           try {
                             getGroupUserInfo(
                                     _messagesMatch[index].content!.group!.id,
-                                    _messagesMatch[index].content!.fromUser!.id)
+                                    _messagesMatch[index]
+                                        .content!
+                                        .fromUser!
+                                        .userId)
                                 .then(
                               (value) => showModalBottomSheet(
                                 context: context,
