@@ -6,7 +6,8 @@ part 'messages.g.dart';
 @JsonSerializable()
 class Messages {
   int count;
-  @JsonKey(defaultValue: [])
+
+  @JsonKey(defaultValue: [], name: 'data')
   List<Message>? content;
 
   Messages({
