@@ -199,6 +199,11 @@ class _ProfileState extends State<Profile> {
                                       changedUser.profile!.description = value;
                                     });
                                   },
+                                  validator: (value) {
+                                    return value!.trim().isNotEmpty
+                                        ? null
+                                        : "please enter description";
+                                  },
                                 ),
                               )
                             ],

@@ -172,9 +172,6 @@ class _LoginFormState extends State<LoginForm> {
                     : "Please enter your email";
               },
             ),
-            Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,

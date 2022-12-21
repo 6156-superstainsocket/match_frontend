@@ -237,9 +237,6 @@ class _RegisterFormState extends State<RegisterForm> {
                 return null;
               },
             ),
-            Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwd,
@@ -255,9 +252,6 @@ class _RegisterFormState extends State<RegisterForm> {
                     : "The length of password cannot be empty";
               },
             ),
-            Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom)),
             const SizedBox(height: defaultPadding),
             TextFormField(
               controller: _pwdConfirm,
