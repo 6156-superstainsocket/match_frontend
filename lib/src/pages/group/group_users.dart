@@ -69,191 +69,203 @@ class _GroupUsersState extends State<GroupUsers> {
         isAdmin: widget.isAdmin,
         memberCount: widget.memberCount,
       ),
-      body: !initialized
-          ? Container(
-              padding: const EdgeInsets.all(defaultPadding),
-              alignment: Alignment.center,
-              child: const SizedBox(
-                width: 24.0,
-                height: 24.0,
-                child: CircularProgressIndicator(strokeWidth: 2.0),
-              ),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: defaultPadding, right: 0.5 * defaultPadding),
-                        child: TextField(
-                          onChanged: (value) {
-                            setState(() {
-                              searchString = value.toLowerCase();
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Search',
-                            suffixIcon: Icon(Icons.search),
+      body: RefreshIndicator(
+        onRefresh: _pullRefresh,
+        child: !initialized
+            ? Container(
+                padding: const EdgeInsets.all(defaultPadding),
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 24.0,
+                  height: 24.0,
+                  child: CircularProgressIndicator(strokeWidth: 2.0),
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: defaultPadding,
+                              right: 0.5 * defaultPadding),
+                          child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                searchString = value.toLowerCase();
+                              });
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Search',
+                              suffixIcon: Icon(Icons.search),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                // Groups List
-                Expanded(
-                  child: ListView.separated(
-                      itemCount: _users.length,
-                      itemBuilder: (context, index) {
-                        // reach bottom
-                        if (_users[index].user!.userId ==
-                            loadingTag.user!.userId) {
-                          if (_users.length - 1 < totalCount) {
-                            _retrieveGroupUserData();
-                            return Container(
-                              padding: const EdgeInsets.all(defaultPadding),
-                              alignment: Alignment.center,
-                              child: const SizedBox(
-                                width: 24.0,
-                                height: 24.0,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2.0),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(defaultPadding),
-                              child: const Text(
-                                "Hit Bottom",
-                                style: TextStyle(color: greyColor),
-                              ),
-                            );
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Groups List
+                  Expanded(
+                    child: ListView.separated(
+                        itemCount: _users.length,
+                        itemBuilder: (context, index) {
+                          // reach bottom
+                          if (_users[index].user!.userId ==
+                              loadingTag.user!.userId) {
+                            if (_users.length - 1 < totalCount) {
+                              _retrieveGroupUserData();
+                              return Container(
+                                padding: const EdgeInsets.all(defaultPadding),
+                                alignment: Alignment.center,
+                                child: const SizedBox(
+                                  width: 24.0,
+                                  height: 24.0,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2.0),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(defaultPadding),
+                                child: const Text(
+                                  "Hit Bottom",
+                                  style: TextStyle(color: greyColor),
+                                ),
+                              );
+                            }
                           }
-                        }
-                        return ("${_users[index].user!.name}")
-                                .toLowerCase()
-                                .contains(searchString)
-                            ? ListTile(
-                                enabled:
-                                    widget.userId != _users[index].user!.userId,
-                                visualDensity: const VisualDensity(
-                                  vertical: visualDensityNum,
-                                ),
-                                leading: ClipOval(
-                                  child:
-                                      allUserIcons[_users[index].user!.iconId!],
-                                ),
-                                title: Row(
-                                  children: [
-                                    Text(
-                                      "${_users[index].user!.name}",
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 0.5 * defaultPadding),
-                                    ),
-                                    (_users[index].tags != null &&
-                                            _users[index].tags!.isNotEmpty)
-                                        ? Expanded(
-                                            flex: 4,
-                                            child: SizedBox(
-                                              height: imgHeight,
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemCount:
-                                                    _users[index].tags!.length,
-                                                itemBuilder:
-                                                    (BuildContext context,
-                                                        int tagIndex) {
-                                                  Tag userTag = _users[index]
-                                                      .tags![tagIndex];
-                                                  return Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 0.5 *
-                                                            defaultPadding),
-                                                    child: Column(
-                                                      children: [
-                                                        Icon(
-                                                          allTagIcons[
-                                                              userTag.iconId!],
-                                                          size: tagMiniHeight,
-                                                          color: userTag
-                                                                  .isMatch!
-                                                              ? pinkHeavyColor
-                                                              : greyHeavyColor,
-                                                        ),
-                                                        Text(
-                                                          userTag.name!,
-                                                          style: userTag
-                                                                  .isMatch!
-                                                              ? tagRedTextStyle
-                                                              : tagBlackTextStyle,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
+                          return ("${_users[index].user!.name}")
+                                  .toLowerCase()
+                                  .contains(searchString)
+                              ? ListTile(
+                                  enabled: widget.userId !=
+                                      _users[index].user!.userId,
+                                  visualDensity: const VisualDensity(
+                                    vertical: visualDensityNum,
+                                  ),
+                                  leading: ClipOval(
+                                    child: allUserIcons[
+                                        _users[index].user!.iconId!],
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        "${_users[index].user!.name}",
+                                      ),
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 0.5 * defaultPadding),
+                                      ),
+                                      (_users[index].tags != null &&
+                                              _users[index].tags!.isNotEmpty)
+                                          ? Expanded(
+                                              flex: 4,
+                                              child: SizedBox(
+                                                height: imgHeight,
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount: _users[index]
+                                                      .tags!
+                                                      .length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int tagIndex) {
+                                                    Tag userTag = _users[index]
+                                                        .tags![tagIndex];
+                                                    return Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 0.5 *
+                                                              defaultPadding),
+                                                      child: Column(
+                                                        children: [
+                                                          Icon(
+                                                            allTagIcons[userTag
+                                                                .iconId!],
+                                                            size: tagMiniHeight,
+                                                            color: userTag
+                                                                    .isMatch!
+                                                                ? pinkHeavyColor
+                                                                : greyHeavyColor,
+                                                          ),
+                                                          Text(
+                                                            userTag.name!,
+                                                            style: userTag
+                                                                    .isMatch!
+                                                                ? tagRedTextStyle
+                                                                : tagBlackTextStyle,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        : Container(),
-                                  ],
-                                ),
-                                onTap: () => {
-                                  debugPrint(
-                                      "User ID ${_users[index].user!.userId}"),
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (context) {
-                                      return FractionallySizedBox(
-                                        heightFactor: popContainerHeightFactor,
-                                        child: EditTag(
-                                          user: _users[index].user!,
-                                          tags: _users[index].tags!,
-                                          groupId: widget.groupId,
-                                          allTags: groupTags,
-                                        ),
-                                      );
-                                    },
-                                  ).then((refresh) {
-                                    if (refresh != null && refresh) {
-                                      setState(() {
-                                        pageOffset = 0;
-                                        totalCount += 1;
-                                        _users = <GroupUser>[loadingTag];
-                                      });
-                                    }
-                                  })
-                                },
-                              )
-                            : Container();
-                      },
-                      separatorBuilder: (context, index) {
-                        return ("${_users[index].user!.name}")
-                                .toLowerCase()
-                                .contains(searchString)
-                            ? const Divider(
-                                height: 1,
-                                color: greyBackground,
-                              )
-                            : Container();
-                      }),
-                ),
-              ],
-            ),
+                                            )
+                                          : Container(),
+                                    ],
+                                  ),
+                                  onTap: () => {
+                                    debugPrint(
+                                        "User ID ${_users[index].user!.userId}"),
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        return FractionallySizedBox(
+                                          heightFactor:
+                                              popContainerHeightFactor,
+                                          child: EditTag(
+                                            user: _users[index].user!,
+                                            tags: _users[index].tags!,
+                                            groupId: widget.groupId,
+                                            allTags: groupTags,
+                                          ),
+                                        );
+                                      },
+                                    ).then((refresh) {
+                                      if (refresh != null && refresh) {
+                                        setState(() {
+                                          pageOffset = 0;
+                                          totalCount += 1;
+                                          _users = <GroupUser>[loadingTag];
+                                        });
+                                      }
+                                    })
+                                  },
+                                )
+                              : Container();
+                        },
+                        separatorBuilder: (context, index) {
+                          return ("${_users[index].user!.name}")
+                                  .toLowerCase()
+                                  .contains(searchString)
+                              ? const Divider(
+                                  height: 1,
+                                  color: greyBackground,
+                                )
+                              : Container();
+                        }),
+                  ),
+                ],
+              ),
+      ),
     );
+  }
+
+  Future<void> _pullRefresh() async {
+    pageOffset = 0;
+    _users = <GroupUser>[loadingTag];
+    _retrieveGroupUserData();
   }
 
   void _retrieveGroupUserData() async {

@@ -50,179 +50,189 @@ class _MessageMatchedState extends State<MessageMatched> {
 
   @override
   Widget build(BuildContext context) {
-    return !initialized
-        ? Container(
-            padding: const EdgeInsets.all(defaultPadding),
-            alignment: Alignment.center,
-            child: const SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: CircularProgressIndicator(strokeWidth: 2.0),
-            ),
-          )
-        : Column(
-            children: [
-              Expanded(
-                child: ListView.separated(
-                  itemCount: _messagesMatch.length,
-                  itemBuilder: ((context, index) {
-                    // reach bottom
-                    if (_messagesMatch[index].type == loadingTag.type) {
-                      if (_messagesMatch.length - 1 < totalCount) {
-                        _retrieveMatchData();
-                        return Container(
-                          alignment: Alignment.center,
-                          child: const SizedBox(
-                            child: CircularProgressIndicator(strokeWidth: 2.0),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(defaultPadding),
-                          child: const Text(
-                            "Hit Bottom",
-                            style: TextStyle(color: greyColor),
-                          ),
-                        );
-                      }
-                    }
-                    return ListTile(
-                      tileColor: _messagesMatch[index].hasRead
-                          ? Colors.white
-                          : pinkLightColor,
-                      visualDensity: const VisualDensity(
-                        vertical: visualDensityNum,
-                      ),
-                      title: IntrinsicHeight(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                children: [
-                                  ClipOval(
-                                    child: allUserIcons[_messagesMatch[index]
-                                        .content!
-                                        .fromUser!
-                                        .iconId!],
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      _messagesMatch[index]
-                                          .content!
-                                          .fromUser!
-                                          .name!,
-                                      style: textMiddleSize,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IntrinsicHeight(
-                                    child: Column(
-                                      children: [
-                                        Icon(
-                                          allTagIcons[_messagesMatch[index]
-                                              .content!
-                                              .tag!
-                                              .iconId!],
-                                          color: pinkHeavyColor,
-                                          size: tagHeight,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            _messagesMatch[index]
-                                                .content!
-                                                .tag!
-                                                .name!,
-                                            style: tagMiniRedTextStyle,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Text('in'),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                children: [
-                                  ClipOval(
-                                    child: allGroupIcons[_messagesMatch[index]
-                                        .content!
-                                        .group!
-                                        .iconId!],
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      _messagesMatch[index]
-                                          .content!
-                                          .group!
-                                          .name!,
-                                      style: textMiddleSize,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        // debugPrint(
-                        //     "User ID ${_messagesMatch[index].content!.fromUser!.userId}");
-                        setState(() {
-                          _messagesMatch[index].hasRead = true;
-                        });
-                        try {
-                          getGroupUserInfo(
-                                  _messagesMatch[index].content!.group!.id,
-                                  _messagesMatch[index].content!.fromUser!.id)
-                              .then(
-                            (value) => showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) {
-                                return FractionallySizedBox(
-                                  heightFactor: popContainerHeightFactor,
-                                  child: EditTag(
-                                    user: value!,
-                                    tags: const [],
-                                    showTags: false,
-                                  ),
-                                );
-                              },
+    return RefreshIndicator(
+      onRefresh: _pullRefresh,
+      child: !initialized
+          ? Container(
+              padding: const EdgeInsets.all(defaultPadding),
+              alignment: Alignment.center,
+              child: const SizedBox(
+                width: 24.0,
+                height: 24.0,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: _messagesMatch.length,
+                    itemBuilder: ((context, index) {
+                      // reach bottom
+                      if (_messagesMatch[index].type == loadingTag.type) {
+                        if (_messagesMatch.length - 1 < totalCount) {
+                          _retrieveMatchData();
+                          return Container(
+                            alignment: Alignment.center,
+                            child: const SizedBox(
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2.0),
                             ),
                           );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())),
+                        } else {
+                          return Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.all(defaultPadding),
+                            child: const Text(
+                              "Hit Bottom",
+                              style: TextStyle(color: greyColor),
+                            ),
                           );
                         }
-                      },
-                    );
-                  }),
-                  separatorBuilder: (context, index) {
-                    return const Divider(height: 1);
-                  },
+                      }
+                      return ListTile(
+                        tileColor: _messagesMatch[index].hasRead
+                            ? Colors.white
+                            : pinkLightColor,
+                        visualDensity: const VisualDensity(
+                          vertical: visualDensityNum,
+                        ),
+                        title: IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  children: [
+                                    ClipOval(
+                                      child: allUserIcons[_messagesMatch[index]
+                                          .content!
+                                          .fromUser!
+                                          .iconId!],
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _messagesMatch[index]
+                                            .content!
+                                            .fromUser!
+                                            .name!,
+                                        style: textMiddleSize,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IntrinsicHeight(
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            allTagIcons[_messagesMatch[index]
+                                                .content!
+                                                .tag!
+                                                .iconId!],
+                                            color: pinkHeavyColor,
+                                            size: tagHeight,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              _messagesMatch[index]
+                                                  .content!
+                                                  .tag!
+                                                  .name!,
+                                              style: tagMiniRedTextStyle,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Text('in'),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  children: [
+                                    ClipOval(
+                                      child: allGroupIcons[_messagesMatch[index]
+                                          .content!
+                                          .group!
+                                          .iconId!],
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _messagesMatch[index]
+                                            .content!
+                                            .group!
+                                            .name!,
+                                        style: textMiddleSize,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        onTap: () {
+                          // debugPrint(
+                          //     "User ID ${_messagesMatch[index].content!.fromUser!.userId}");
+                          setState(() {
+                            _messagesMatch[index].hasRead = true;
+                          });
+                          try {
+                            getGroupUserInfo(
+                                    _messagesMatch[index].content!.group!.id,
+                                    _messagesMatch[index].content!.fromUser!.id)
+                                .then(
+                              (value) => showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) {
+                                  return FractionallySizedBox(
+                                    heightFactor: popContainerHeightFactor,
+                                    child: EditTag(
+                                      user: value!,
+                                      tags: const [],
+                                      showTags: false,
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        },
+                      );
+                    }),
+                    separatorBuilder: (context, index) {
+                      return const Divider(height: 1);
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
+              ],
+            ),
+    );
+  }
+
+  Future<void> _pullRefresh() async {
+    pageOffset = 0;
+    _messagesMatch = <Message>[loadingTag];
+    _retrieveMatchData();
   }
 
   void _retrieveMatchData() async {
