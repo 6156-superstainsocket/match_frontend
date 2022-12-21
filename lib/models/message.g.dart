@@ -9,7 +9,7 @@ part of 'message.dart';
 Message _$MessageFromJson(Map<String, dynamic> json) => Message(
       id: json['id'] as String,
       type: json['type'] as int? ?? 0,
-      hasRead: json['hasRead'] as bool? ?? false,
+      hasRead: json['has_read'] as bool? ?? false,
       uid: json['uid'] as int? ?? 0,
       email: json['email'] as String? ?? '',
       content: json['content'] == null
@@ -22,6 +22,6 @@ Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'uid': instance.uid,
       'email': instance.email,
       'type': instance.type,
-      'hasRead': instance.hasRead,
+      'has_read': instance.hasRead,
       'content': instance.content,
     };
