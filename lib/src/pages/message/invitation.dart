@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
 import 'package:demo/models/message.dart';
+import 'package:demo/models/messages.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -23,42 +27,15 @@ String getText(bool hasRead, bool hasAccept) {
 }
 
 class _InvitationState extends State<Invitation> {
-  static final Message loadingTag = Message(id: -1, type: 2);
+  static final Message loadingTag = Message(id: '-1', type: -1, hasRead: true);
   var _messagesName = <Message>[loadingTag];
-  final _fakeMessages = <Message>[
-    Message(
-      id: 1,
-      type: 2,
-      userId: 1,
-      userIconId: 0,
-      userName: "User1",
-      groupId: 0,
-      groupIconId: 5,
-      groupName: "Group3",
-      hasAccept: false,
-      hasRead: false,
-    ),
-    Message(
-      id: 2,
-      type: 2,
-      userId: 2,
-      userIconId: 9,
-      userName: "User2",
-      groupId: 9,
-      groupIconId: 3,
-      groupName: "Group2",
-      hasAccept: false,
-      hasRead: false,
-    )
-  ];
+  int pageOffset = 0;
+  int totalCount = 0;
 
   @override
   void initState() {
     super.initState();
-    // TODO: initial data
-    setState(() {
-      _messagesName.insertAll(_messagesName.length - 1, _fakeMessages);
-    });
+    _retrieveData();
   }
 
   @override
@@ -70,146 +47,187 @@ class _InvitationState extends State<Invitation> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: ListView.separated(
-            itemCount: _messagesName.length,
-            itemBuilder: (BuildContext context, int index) {
-              if (_messagesName[index].id == loadingTag.id) {
-                if (_messagesName.length - 1 < 4) {
-                  // TODO: retrieve data, replace 15 with total groups num
-                  _retrieveData();
-                  return Container(
-                    alignment: Alignment.center,
-                    child: const SizedBox(
-                      child: CircularProgressIndicator(strokeWidth: 2.0),
-                    ),
-                  );
-                } else {
-                  return Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(defaultPadding),
-                    child: const Text(
-                      "Hit Bottom",
-                      style: TextStyle(color: greyColor),
-                    ),
-                  );
-                }
-              }
-              return Slidable(
-                enabled: !_messagesName[index].hasRead!,
-                closeOnScroll: true,
-                startActionPane: ActionPane(
-                  motion: const ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        setState(() {
-                          _messagesName[index].hasRead = true;
-                          _messagesName[index].hasAccept = false;
-                        });
-                      },
-                      backgroundColor: pinkHeavyColor,
-                      label: 'Deny',
-                      autoClose: true,
-                    )
-                  ],
-                ),
-                endActionPane: ActionPane(
-                  motion: const ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        setState(() {
-                          _messagesName[index].hasRead = true;
-                          _messagesName[index].hasAccept = true;
-                        });
-                      },
-                      backgroundColor: greenColor,
-                      label: 'Accept',
-                    )
-                  ],
-                ),
-                child: ListTile(
-                  tileColor: getBackGroundColor(_messagesName[index].hasRead!,
-                      _messagesName[index].hasAccept!),
-                  visualDensity: const VisualDensity(
-                    vertical: visualDensityNum,
-                  ),
-                  title: IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              ClipOval(
-                                child: allUserIcons[
-                                    _messagesName[index].userIconId!],
-                              ),
-                              Expanded(
-                                child: Text(
-                                  _messagesName[index].userName!,
-                                  style: textMiddleSize,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+    return _messagesName.isEmpty || _messagesName[0].type == -1
+        ? Container(
+            padding: const EdgeInsets.all(defaultPadding),
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 24.0,
+              height: 24.0,
+              child: CircularProgressIndicator(strokeWidth: 2.0),
+            ),
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _messagesName.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (_messagesName[index].type == loadingTag.type) {
+                      if (_messagesName.length - 1 < totalCount) {
+                        _retrieveData();
+                        return Container(
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            child: CircularProgressIndicator(strokeWidth: 2.0),
                           ),
+                        );
+                      } else {
+                        return Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(defaultPadding),
+                          child: const Text(
+                            "Hit Bottom",
+                            style: TextStyle(color: greyColor),
+                          ),
+                        );
+                      }
+                    }
+                    return Slidable(
+                      enabled: !_messagesName[index].hasRead,
+                      closeOnScroll: true,
+                      startActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              setState(() {
+                                _messagesName[index].hasRead = true;
+                                _messagesName[index].content!.hasAccept = false;
+                              });
+                            },
+                            backgroundColor: pinkHeavyColor,
+                            label: 'Deny',
+                            autoClose: true,
+                          )
+                        ],
+                      ),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              setState(() {
+                                _messagesName[index].hasRead = true;
+                                _messagesName[index].content!.hasAccept = true;
+                              });
+                            },
+                            backgroundColor: greenColor,
+                            label: 'Accept',
+                          )
+                        ],
+                      ),
+                      child: ListTile(
+                        tileColor: getBackGroundColor(
+                            _messagesName[index].hasRead,
+                            _messagesName[index].content!.hasAccept),
+                        visualDensity: const VisualDensity(
+                          vertical: visualDensityNum,
                         ),
-                        Expanded(
+                        title: IntrinsicHeight(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                getText(_messagesName[index].hasRead!,
-                                    _messagesName[index].hasAccept!),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    ClipOval(
+                                      child: allUserIcons[_messagesName[index]
+                                          .content!
+                                          .fromUser!
+                                          .id],
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _messagesName[index]
+                                            .content!
+                                            .fromUser!
+                                            .name!,
+                                        style: textMiddleSize,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      getText(
+                                          _messagesName[index].hasRead,
+                                          _messagesName[index]
+                                              .content!
+                                              .hasAccept),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    ClipOval(
+                                      child: allGroupIcons[_messagesName[index]
+                                          .content!
+                                          .group!
+                                          .iconId!],
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _messagesName[index]
+                                            .content!
+                                            .group!
+                                            .name!,
+                                        style: textMiddleSize,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                             ],
                           ),
                         ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              ClipOval(
-                                child: allGroupIcons[
-                                    _messagesName[index].groupIconId!],
-                              ),
-                              Expanded(
-                                child: Text(
-                                  _messagesName[index].groupName!,
-                                  style: textMiddleSize,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    debugPrint("Message ID ${_messagesName[index].id}");
+                        onTap: () {
+                          debugPrint("Message ID ${_messagesName[index].id}");
+                        },
+                      ),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider(height: 1);
                   },
                 ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return const Divider(height: 1);
-            },
-          ),
-        )
-      ],
-    );
+              )
+            ],
+          );
   }
 
-  void _retrieveData() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
+  void _retrieveData() async {
+    int? userId = await loadUserId();
+    if (userId == null) {
+      throw Exception('Failed to get user ID');
+    }
+
+    Response response;
+    response = await messageDio.get(
+        '/messages/$userId?page=$pageOffset&limit=$groupsLoadNum&type=$inviteMessageType');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
+
+    Messages messagesResponse = Messages.fromJson(response.data);
+
+    totalCount = messagesResponse.count;
+    pageOffset += 1;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        _messagesName.insertAll(_messagesName.length - 1, _fakeMessages);
+        _messagesName.insertAll(
+            _messagesName.length - 1, messagesResponse.content!);
       });
     });
   }

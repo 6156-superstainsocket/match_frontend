@@ -7,39 +7,21 @@ part of 'message.dart';
 // **************************************************************************
 
 Message _$MessageFromJson(Map<String, dynamic> json) => Message(
-      id: json['id'] as int,
-      type: json['type'] as int,
-      userId: json['userId'] as int? ?? 0,
-      userName: json['userName'] as String? ?? '',
-      userIconId: json['userIconId'] as int? ?? 0,
-      tagId: json['tagId'] as int? ?? 0,
-      tagName: json['tagName'] as String? ?? '',
-      tagIconId: json['tagIconId'] as int? ?? 0,
-      groupId: json['groupId'] as int? ?? 0,
-      groupName: json['groupName'] as String? ?? '',
-      groupIconId: json['groupIconId'] as int? ?? 0,
+      id: json['id'] as String,
+      type: json['type'] as int? ?? 0,
       hasRead: json['hasRead'] as bool? ?? false,
-      hasAccept: json['hasAccept'] as bool? ?? false,
-      inviteByUserId: json['inviteByUserId'] as int? ?? 0,
-      inviteByUserName: json['inviteByUserName'] as String? ?? '',
-      inviteByUserIconId: json['inviteByUserIconId'] as int? ?? 0,
+      uid: json['uid'] as int? ?? 0,
+      email: json['email'] as String? ?? '',
+      content: json['content'] == null
+          ? null
+          : MessageContent.fromJson(json['content'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'userName': instance.userName,
-      'userIconId': instance.userIconId,
-      'tagId': instance.tagId,
-      'tagName': instance.tagName,
-      'tagIconId': instance.tagIconId,
-      'groupId': instance.groupId,
-      'groupName': instance.groupName,
-      'groupIconId': instance.groupIconId,
+      'uid': instance.uid,
+      'email': instance.email,
       'type': instance.type,
       'hasRead': instance.hasRead,
-      'hasAccept': instance.hasAccept,
-      'inviteByUserId': instance.inviteByUserId,
-      'inviteByUserName': instance.inviteByUserName,
-      'inviteByUserIconId': instance.inviteByUserIconId,
+      'content': instance.content,
     };

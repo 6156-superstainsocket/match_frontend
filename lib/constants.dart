@@ -139,6 +139,8 @@ const double visualDensityNum = 3.0;
 const int groupsLoadNum = 20;
 // number of users returned per request
 const int groupUsersLoadNum = 20;
+// number of messages returned per request
+const int messageLoadNum = 20;
 
 Color getBackGroundColor(bool hasRead, bool hasAccept) {
   if (!hasRead) {
@@ -202,3 +204,17 @@ var groupDio = Dio(
       baseUrl: 'https://a31ow36s4g.execute-api.us-east-1.amazonaws.com/api',
       headers: {'Access-Control-Allow-Origin': '*'}),
 );
+
+var messageDio = Dio(
+  BaseOptions(
+    baseUrl:
+        'https://6oj1v7rjte.execute-api.us-east-1.amazonaws.com/6156microservice',
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  ),
+);
+
+const int matchMessageType = 1;
+const int inviteMessageType = 2;
+const int manageMessageType = 3;

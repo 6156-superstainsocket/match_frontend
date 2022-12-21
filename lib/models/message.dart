@@ -16,11 +16,15 @@ class Message {
   @JsonKey(defaultValue: 0)
   int type;
 
+  @JsonKey(defaultValue: false)
+  bool hasRead;
+
   MessageContent? content;
 
   Message({
     required this.id,
     required this.type,
+    required this.hasRead,
     this.uid,
     this.email,
     this.content,
