@@ -48,18 +48,21 @@ class _EditTagState extends State<EditTag> {
     super.initState();
     user = widget.user;
     _retrieveUserId();
+    previewTags = widget.tags;
 
     if (widget.allTags != null) {
       allTags = widget.allTags!;
       Map<int, Tag> previewTagsMap = {
         for (var item in previewTags) item.id!: item
       };
-      for (var i = 0; i < widget.allTags!.length; i++) {
-        if (previewTagsMap.containsKey(widget.allTags![i].id!)) {
-          checkboxValues[widget.allTags![i]] = true;
-          allTags[i].isMatch = previewTagsMap[widget.allTags![i].id!]!.isMatch;
+
+      for (var i = 0; i < allTags.length; i++) {
+        if (previewTagsMap.containsKey(allTags[i].id!)) {
+          allTags[i].isMatch = previewTagsMap[allTags[i].id!]!.isMatch;
+          checkboxValues[allTags[i]] = true;
         } else {
-          checkboxValues[widget.allTags![i]] = false;
+          allTags[i].isMatch = false;
+          checkboxValues[allTags[i]] = false;
         }
       }
     }
