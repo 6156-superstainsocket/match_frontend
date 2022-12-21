@@ -28,6 +28,7 @@ class _ManagementState extends State<Management> {
   var _messagesName = <Message>[loadingTag];
   int pageOffset = 0;
   int totalCount = 0;
+  bool initialized = false;
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _ManagementState extends State<Management> {
 
   @override
   Widget build(BuildContext context) {
-    return _messagesName.isEmpty || _messagesName[0].type == -1
+    return !initialized
         ? Container(
             padding: const EdgeInsets.all(defaultPadding),
             alignment: Alignment.center,
@@ -255,6 +256,7 @@ class _ManagementState extends State<Management> {
       setState(() {
         _messagesName.insertAll(
             _messagesName.length - 1, messagesResponse.content!);
+        initialized = true;
       });
     });
   }

@@ -31,6 +31,7 @@ class _InvitationState extends State<Invitation> {
   var _messagesName = <Message>[loadingTag];
   int pageOffset = 0;
   int totalCount = 0;
+  bool initialized = false;
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _InvitationState extends State<Invitation> {
 
   @override
   Widget build(BuildContext context) {
-    return _messagesName.isEmpty || _messagesName[0].type == -1
+    return !initialized
         ? Container(
             padding: const EdgeInsets.all(defaultPadding),
             alignment: Alignment.center,
@@ -228,6 +229,7 @@ class _InvitationState extends State<Invitation> {
       setState(() {
         _messagesName.insertAll(
             _messagesName.length - 1, messagesResponse.content!);
+        initialized = true;
       });
     });
   }

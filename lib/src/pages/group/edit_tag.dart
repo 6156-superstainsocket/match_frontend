@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:demo/constants.dart';
+import 'package:demo/models/customresponse.dart';
 import 'package:demo/models/tag.dart';
 import 'package:demo/models/user.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class EditTag extends StatefulWidget {
   final User user;
   final List<Tag> tags;
   final bool? showTags;
+  final List<Tag>? allTags;
+  final int? groupId;
   const EditTag({
     super.key,
     required this.user,
     required this.tags,
     this.showTags = true,
+    this.allTags,
+    this.groupId,
   });
 
   @override
@@ -22,15 +30,25 @@ class _EditTagState extends State<EditTag> {
   User user = User(id: 0);
   bool showContactInfo = false;
   List<Tag> previewTags = [];
-  List<Tag> allCustomTags = [];
   List<Tag> allTags = [];
-
+  int myUserId = 0;
   Map<Tag, bool> checkboxValues = {};
+
+  void _retrieveUserId() async {
+    int? currentUserId = await loadUserId();
+    if (currentUserId != null) {
+      setState(() {
+        myUserId = currentUserId;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
+    allTags = widget.allTags!;
+    _retrieveUserId();
 
     if (widget.tags.isNotEmpty) {
       previewTags = widget.tags;
@@ -51,15 +69,32 @@ class _EditTagState extends State<EditTag> {
       for (var item in previewTags) item.id!: item
     };
 
-    // TODO, get allCustomTags from API
-    allTags = [...defaultTags, ...allCustomTags];
-
-    for (var i = 0; i < allTags.length; i++) {
-      if (previewTagsMap.containsKey(allTags[i].id!)) {
-        checkboxValues[allTags[i]] = true;
+    for (var i = 0; i < widget.allTags!.length; i++) {
+      if (previewTagsMap.containsKey(widget.allTags![i].id!)) {
+        checkboxValues[widget.allTags![i]] = true;
+        allTags[i].isMatch = previewTagsMap[widget.allTags![i].id!]!.isMatch;
       } else {
-        checkboxValues[allTags[i]] = false;
+        checkboxValues[widget.allTags![i]] = false;
       }
+    }
+  }
+
+  Future<void> updateTags(int userId) async {
+    List<int> tagIds = [];
+    checkboxValues.forEach((key, value) {
+      if (value) {
+        tagIds.add(key.id!);
+      }
+    });
+    Response response = await groupDio.put('/likes', data: {
+      "uid_from": myUserId,
+      "uid_to": user.userId,
+      "tagIds": tagIds,
+      "groupId": widget.groupId,
+    });
+    CustomResponse data = CustomResponse.fromJson(response.data);
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: ${data.detail}');
     }
   }
 
@@ -84,8 +119,16 @@ class _EditTagState extends State<EditTag> {
         actions: widget.showTags!
             ? [
                 TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      try {
+                        await updateTags(user.userId).whenComplete(() {
+                          Navigator.pop(context, true);
+                        });
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString())),
+                        );
+                      }
                     },
                     child: const Text('Save'))
               ]
