@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:demo/constants.dart';
 import 'package:demo/models/group_user.dart';
 import 'package:demo/models/message.dart';
+import 'package:demo/models/messages.dart';
 import 'package:demo/models/user.dart' as match_user;
 import 'package:demo/src/pages/group/edit_tag.dart';
 import 'package:dio/dio.dart';
@@ -16,59 +17,16 @@ class MessageMatched extends StatefulWidget {
 }
 
 class _MessageMatchedState extends State<MessageMatched> {
-  String fakeResponse =
-      '{"count":1,"data":[{"userId":1,"tagId":2,"groupId":8,"hasRead":false,"type":1,"userName":"User1","userIconId":10,"groupName":"Group1","groupIconId":10,"tagIconId":3,"tagName":"like"}]}';
-  static final Message loadingTag = Message(id: -1, type: 1);
+  static final Message loadingTag =
+      Message(id: "loadingTag", type: -1, hasRead: true);
   var _messagesMatch = <Message>[loadingTag];
-  final _fakeMessages = <Message>[
-    Message(
-      id: 1,
-      userId: 1,
-      userName: "user 1",
-      userIconId: 1,
-      tagId: 1,
-      tagName: "tag 1",
-      tagIconId: 1,
-      groupId: 1,
-      groupName: "group 1",
-      groupIconId: 1,
-      type: 1,
-    ),
-    Message(
-      id: 2,
-      userId: 2,
-      userName: "user 2",
-      userIconId: 2,
-      tagId: 2,
-      tagName: "tag 2",
-      tagIconId: 2,
-      groupId: 2,
-      groupName: "group 2",
-      groupIconId: 2,
-      type: 2,
-    ),
-    Message(
-      id: 3,
-      userId: 3,
-      userName: "user 3",
-      userIconId: 3,
-      tagId: 3,
-      tagName: "tag 3",
-      tagIconId: 3,
-      groupId: 3,
-      groupName: "group 3",
-      groupIconId: 3,
-      type: 3,
-    ),
-  ];
+  int pageOffset = 0;
+  int totalCount = 0;
 
   @override
   void initState() {
     super.initState();
-    // TODO: initial data
-    setState(() {
-      _messagesMatch.insertAll(_messagesMatch.length - 1, _fakeMessages);
-    });
+    _retrieveMatchData();
   }
 
   @override
@@ -91,80 +49,70 @@ class _MessageMatchedState extends State<MessageMatched> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            itemCount: _messagesMatch.length,
-            itemBuilder: ((context, index) {
-              // reach bottom
-              if (_messagesMatch[index].id == loadingTag.id) {
-                if (_messagesMatch.length - 1 < 6) {
-                  // TODO: retrieve data, replace 15 with total groups num
-                  _retrieveMatchData();
-                  return Container(
-                    alignment: Alignment.center,
-                    child: const SizedBox(
-                      child: CircularProgressIndicator(strokeWidth: 2.0),
-                    ),
-                  );
-                } else {
-                  return Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(defaultPadding),
-                    child: const Text(
-                      "Hit Bottom",
-                      style: TextStyle(color: greyColor),
-                    ),
-                  );
-                }
-              }
-              return ListTile(
-                tileColor: _messagesMatch[index].hasRead!
-                    ? Colors.white
-                    : pinkLightColor,
-                visualDensity: const VisualDensity(
-                  vertical: visualDensityNum,
-                ),
-                title: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            ClipOval(
-                              child: allUserIcons[
-                                  _messagesMatch[index].userIconId!],
-                            ),
-                            Expanded(
-                              child: Text(
-                                _messagesMatch[index].userName!,
-                                style: textMiddleSize,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+    return _messagesMatch.isEmpty || _messagesMatch[0].type == -1
+        ? Container(
+            padding: const EdgeInsets.all(defaultPadding),
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 24.0,
+              height: 24.0,
+              child: CircularProgressIndicator(strokeWidth: 2.0),
+            ),
+          )
+        : Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _messagesMatch.length,
+                  itemBuilder: ((context, index) {
+                    // reach bottom
+                    if (_messagesMatch[index].type == loadingTag.type) {
+                      if (_messagesMatch.length - 1 < totalCount) {
+                        _retrieveMatchData();
+                        return Container(
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            child: CircularProgressIndicator(strokeWidth: 2.0),
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(defaultPadding),
+                          child: const Text(
+                            "Hit Bottom",
+                            style: TextStyle(color: greyColor),
+                          ),
+                        );
+                      }
+                    }
+                    return ListTile(
+                      tileColor: _messagesMatch[index].hasRead
+                          ? Colors.white
+                          : pinkLightColor,
+                      visualDensity: const VisualDensity(
+                        vertical: visualDensityNum,
                       ),
-                      Expanded(
+                      title: IntrinsicHeight(
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IntrinsicHeight(
+                            Expanded(
+                              flex: 2,
                               child: Column(
                                 children: [
-                                  Icon(
-                                    allTagIcons[
-                                        _messagesMatch[index].tagIconId!],
-                                    color: pinkHeavyColor,
-                                    size: tagHeight,
+                                  ClipOval(
+                                    child: allUserIcons[_messagesMatch[index]
+                                        .content!
+                                        .fromUser!
+                                        .iconId!],
                                   ),
                                   Expanded(
                                     child: Text(
-                                      _messagesMatch[index].tagName!,
-                                      style: tagMiniRedTextStyle,
+                                      _messagesMatch[index]
+                                          .content!
+                                          .fromUser!
+                                          .name!,
+                                      style: textMiddleSize,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -172,77 +120,132 @@ class _MessageMatchedState extends State<MessageMatched> {
                                 ],
                               ),
                             ),
-                            const Text('in'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            ClipOval(
-                              child: allGroupIcons[
-                                  _messagesMatch[index].groupIconId!],
-                            ),
                             Expanded(
-                              child: Text(
-                                _messagesMatch[index].groupName!,
-                                style: textMiddleSize,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IntrinsicHeight(
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          allTagIcons[_messagesMatch[index]
+                                              .content!
+                                              .tag!
+                                              .iconId!],
+                                          color: pinkHeavyColor,
+                                          size: tagHeight,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            _messagesMatch[index]
+                                                .content!
+                                                .tag!
+                                                .name!,
+                                            style: tagMiniRedTextStyle,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Text('in'),
+                                ],
                               ),
                             ),
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                children: [
+                                  ClipOval(
+                                    child: allGroupIcons[_messagesMatch[index]
+                                        .content!
+                                        .group!
+                                        .iconId!],
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      _messagesMatch[index]
+                                          .content!
+                                          .group!
+                                          .name!,
+                                      style: textMiddleSize,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
-                      )
-                    ],
-                  ),
-                ),
-                onTap: () {
-                  debugPrint("User ID ${_messagesMatch[index].userId}");
-                  setState(() {
-                    _messagesMatch[index].hasRead = true;
-                  });
-                  try {
-                    getGroupUserInfo(_messagesMatch[index].groupId!,
-                            _messagesMatch[index].userId!)
-                        .then(
-                      (value) => showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) {
-                          return FractionallySizedBox(
-                            heightFactor: popContainerHeightFactor,
-                            child: EditTag(
-                              user: value!,
-                              tags: const [],
-                              showTags: false,
+                      ),
+                      onTap: () {
+                        // debugPrint(
+                        //     "User ID ${_messagesMatch[index].content!.fromUser!.userId}");
+                        setState(() {
+                          _messagesMatch[index].hasRead = true;
+                        });
+                        try {
+                          getGroupUserInfo(
+                                  _messagesMatch[index].content!.group!.id,
+                                  _messagesMatch[index].content!.fromUser!.id)
+                              .then(
+                            (value) => showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) {
+                                return FractionallySizedBox(
+                                  heightFactor: popContainerHeightFactor,
+                                  child: EditTag(
+                                    user: value!,
+                                    tags: const [],
+                                    showTags: false,
+                                  ),
+                                );
+                              },
                             ),
                           );
-                        },
-                      ),
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
+                      },
                     );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                },
-              );
-            }),
-            separatorBuilder: (context, index) {
-              return const Divider(height: 1);
-            },
-          ),
-        ),
-      ],
-    );
+                  }),
+                  separatorBuilder: (context, index) {
+                    return const Divider(height: 1);
+                  },
+                ),
+              ),
+            ],
+          );
   }
 
-  void _retrieveMatchData() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
+  void _retrieveMatchData() async {
+    int? userId = await loadUserId();
+    if (userId == null) {
+      throw Exception('Failed to get user ID');
+    }
+
+    Response response;
+    response = await messageDio.get(
+        '/messages/$userId?page=$pageOffset&limit=$groupsLoadNum&type=$matchMessageType');
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error HTTP Code: ${response.statusCode}');
+    }
+
+    Messages messagesResponse = Messages.fromJson(response.data);
+
+    totalCount = messagesResponse.count;
+    pageOffset += 1;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        _messagesMatch.insertAll(_messagesMatch.length - 1, _fakeMessages);
+        _messagesMatch.insertAll(
+            _messagesMatch.length - 1, messagesResponse.content!);
       });
     });
   }
