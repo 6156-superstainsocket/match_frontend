@@ -16,7 +16,7 @@ class Message {
   @JsonKey(defaultValue: 0)
   int type;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: false, name: 'has_read')
   bool hasRead;
 
   MessageContent? content;

@@ -47,8 +47,22 @@ class _EditTagState extends State<EditTag> {
   void initState() {
     super.initState();
     user = widget.user;
-    allTags = widget.allTags!;
     _retrieveUserId();
+
+    if (widget.allTags != null) {
+      allTags = widget.allTags!;
+      Map<int, Tag> previewTagsMap = {
+        for (var item in previewTags) item.id!: item
+      };
+      for (var i = 0; i < widget.allTags!.length; i++) {
+        if (previewTagsMap.containsKey(widget.allTags![i].id!)) {
+          checkboxValues[widget.allTags![i]] = true;
+          allTags[i].isMatch = previewTagsMap[widget.allTags![i].id!]!.isMatch;
+        } else {
+          checkboxValues[widget.allTags![i]] = false;
+        }
+      }
+    }
 
     if (widget.tags.isNotEmpty) {
       previewTags = widget.tags;
@@ -62,19 +76,6 @@ class _EditTagState extends State<EditTag> {
           showContactInfo = true;
           break;
         }
-      }
-    }
-
-    Map<int, Tag> previewTagsMap = {
-      for (var item in previewTags) item.id!: item
-    };
-
-    for (var i = 0; i < widget.allTags!.length; i++) {
-      if (previewTagsMap.containsKey(widget.allTags![i].id!)) {
-        checkboxValues[widget.allTags![i]] = true;
-        allTags[i].isMatch = previewTagsMap[widget.allTags![i].id!]!.isMatch;
-      } else {
-        checkboxValues[widget.allTags![i]] = false;
       }
     }
   }
@@ -315,6 +316,7 @@ class _EditTagState extends State<EditTag> {
                                   Tag key =
                                       checkboxValues.keys.elementAt(index);
                                   return CheckboxListTile(
+                                    enabled: key.isMatch == false,
                                     title: Row(
                                       children: [
                                         Column(

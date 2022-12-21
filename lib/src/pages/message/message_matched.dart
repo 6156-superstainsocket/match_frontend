@@ -37,6 +37,17 @@ class _MessageMatchedState extends State<MessageMatched> {
     }
   }
 
+  Future<void> updateMatchMessage(String messageId) async {
+    Response response = await messageDio.patch('/messages', data: {
+      "id": messageId,
+      "has_read": true,
+    });
+
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('error: $response');
+    }
+  }
+
   Future<match_user.User?> getGroupUserInfo(int groupId, int userId) async {
     Response response;
     response = await groupDio.get('/groups/$groupId/users/$userId');
