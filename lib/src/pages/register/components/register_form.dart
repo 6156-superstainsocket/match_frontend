@@ -227,7 +227,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 prefixIcon: Icon(Icons.email),
               ),
               validator: (value) {
-                if (value!.trim().isNotEmpty) {
+                if (value!.trim().isEmpty) {
                   return "Please enter your email";
                 } else if (!RegExp(
                         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
